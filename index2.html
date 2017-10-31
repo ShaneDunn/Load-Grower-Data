@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<base target="_top">
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+<link rel='stylesheet' href='//fonts.googleapis.com/css?family=Roboto' type='text/css'>  
+<style>
+  body {
+  font-family: 'Roboto', sans-serif;
+  margin: 4%;
+  width: 500px;
+  }
+  .branding-below {
+    bottom: 20px;
+    top: 0;
+  }
+  
+  .branding-text {
+    left: 7px;
+    position: relative;
+    top: 3px;
+  }
+  
+  .col-contain {
+    overflow: hidden;
+  }
+  
+  .col-one {
+    float: left;
+    width: 50%;
+  }
+  
+  .logo {
+    vertical-align: middle;
+  }
+  
+  .radio-spacer {
+    height: 20px;
+  }
+  
+  .width-100 {
+    width: 100%;
+  }
+  
+  #dlink {
+  background: -webkit-linear-gradient(top , #4d90fe , #357ae8);
+  padding: 7px;
+  color: white;
+  border: 1px solid #3079ed;
+  font-family: "arial" , sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  margin: 0;
+  outline: 0;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 2px;
+  }
+  
+  a:hover
+  {
+      text-decoration:none;
+  }
+  
+  hr {
+  width: 25em;
+  margin-top: 30px;
+  margin-bottom: 17px;
+  border-color: rgb(141, 141, 155);
+  }
+  
+  .result {
+   display: none;
+   color: #29691d;
+   font-weight: bold;
+   border: 1px solid #29691d;
+   border-radius: 2px;
+   padding: 2px;
+   margin-bottom:5px;
+  }
+  .error {
+   display: none;
+   color: #dd4b39;
+   font-weight: bold;
+   border: 1px solid #dd4b39;
+   border-radius: 2px;
+   padding: 2px;
+  }
+  h2 { color: #dd4b39; font-size: 20px; }
+  h3 { color: #29691d; font-size: 20px; }
+  p { font-size: 14px; }
+  #btn { float:right; border-radius: 15px; margin-top:5px; }
+.sidebar {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 12px;
+  position: absolute;
+  width: 90%;
+}
+
+
+</style>
+<div id='glass' style="background-color: rgb(237, 237, 236); z-index: 2; opacity: 0.75; position: absolute;"></div>
+<div id='loading' style='z-index: 3; top: 50%; left: 50%; position: absolute;'><img src='https://ssl.gstatic.com/ui/v1/activityindicator/loading_bg_f5.gif'></div>
+
+<div id='fullBody' class="sidebar branding-below" style="display:none;">
+  <div style="margin-top: 10px;" >
+  <b>Choose File to Upload</b>
+    <form>
+      <input type="file"   name="thefile" style="margin-bottom:15px;"> <br>
+      <input type="button" value="Upload" id="button"  class='blue uploadBtn'>
+      <input type="button" value="Close"  id="button2" class='cancelBtn'>
+    </form>
+  </div>
+</div>
+<!-- UPLOAD UI ENDS -->
+  <br>
+  <!-- <div id='result' class='result'><div>That's awesome! Here is your document link</div><span><a id='link' href='' target='_blank'>Open Now</a></span></div> -->
+  <div id='result' class='result'>
+    <h3>Complete</h3>
+    <p>File Load successful</p>
+    <input id="btn" type="button" value="Close" onclick="google.script.host.close()" />
+  </div>
+  <div id='errorbx'  class='error'>
+    <h2>Error</h2>
+    <p><span id='error'></span></p>
+    <input id="btn" type="button" value="Close" onclick="google.script.host.close()" />
+  </div>
+  
+<div class="sidebar bottom">
+  <span class="gray branding-text">How to!</span>
+  <li><span class="gray branding-text">Browse any JSON file from your computer</span></li>
+  <li><span class="gray branding-text"><b>Select and Upload</b></span></li>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script>
+  function uploadCompleted(url) {
+    //If the file is uploaded Successfully, show result
+    $('#loading').hide();
+    $('#glass').hide();
+    if (url.substring(0, 7) == 'Error: ') {
+      $('#error').html(url);
+      $('#fullBody').hide();
+      $('#errorbx').show();
+    } else {
+      $('#fullBody').hide();
+      $('#result').show();
+    }
+  }
+
+  $(function() {
+    $('#fullBody').show();
+    $('#errorbx').hide();
+    $('#result').hide();
+    $('#loading').hide();
+    $('#glass').hide();
+    $('.uploadBtn').click(function() {
+      $('#loading').show();
+      $('#glass').show(); 
+      $('#result').hide();
+      $('#errorbx').hide();
+      google.script.run.withSuccessHandler(uploadCompleted).serverUpload(this.parentNode);
+    });
+    $('.cancelBtn').click(function() {
+      google.script.host.close();
+    });
+  });
+</script>
