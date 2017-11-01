@@ -86,12 +86,16 @@ function serverUpload3(jsonData) {
         qrowData[0]  = growerAd.ad_name;
         qrowData[2]  = growerAd.ad_attn;
         qrowData[1]  = formatPhoneNumber(growerAd.ad_fax2);
-        cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn + formatPhoneNumber(growerAd.ad_fax2);
-        if  (growerAd.ad_attn2) {
-          if (cont_arr.indexOf(growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.ad_phone2)) == -1) {
-            cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.ad_phone2);
-            qrowData[2]  = qrowData[2] + crlf + growerAd.ad_attn2;
-            qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerAd.ad_phone2);
+        if (formatPhoneNumber(growerAd.ad_fax2) !== null) {
+          cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn + formatPhoneNumber(growerAd.ad_fax2);
+        }
+        if (growerAd.ad_attn2) {
+          if (formatPhoneNumber(growerAd.ad_phone2) !== null) {
+            if (cont_arr.indexOf(growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.ad_phone2)) == -1) {
+              cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.ad_phone2);
+              qrowData[2]  = qrowData[2] + crlf + growerAd.ad_attn2;
+              qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerAd.ad_phone2);    
+            }
           }
         }
       }
@@ -116,10 +120,12 @@ function serverUpload3(jsonData) {
         growData[5] = growData[5].trim() + sep +
                       loadContact(growerVdAd.ad_attn, growerVdAd.ad_fax2, growerVdAd.ad_phone, growerVdAd.ad_fax, growerVdAd.ad__chr01) ; // Contact 3
         if  (growerVdAd.ad_attn) {
-          if (cont_arr.indexOf(growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone)) == -1) {
-            cont_arr = cont_arr + "|" + growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone);
-            qrowData[2]  = qrowData[2] + crlf + growerVdAd.ad_attn;
-            qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerVdAd.ad_phone);
+          if (formatPhoneNumber(growerAd.ad_phone) !== null) {
+            if (cont_arr.indexOf(growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone)) == -1) {
+              cont_arr = cont_arr + "|" + growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone);
+              qrowData[2]  = qrowData[2] + crlf + growerVdAd.ad_attn;
+              qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerVdAd.ad_phone);
+            }
           }
         }
       }
@@ -399,10 +405,12 @@ function serverUpload3(jsonData) {
                           loadContact(growerVyAd.ad_attn, growerVyAd.ad_fax2, growerVyAd.ad_phone, growerVyAd.ad_fax, growerVyAd.ad__chr01) ; // Contact 3
             rowData[2]  = growerVyAd.ad_name + crlf + loadAddress(growerVyAd.ad_line1, growerVyAd.ad_line2, growerVyAd.ad_line3, growerVyAd.ad_city, growerVyAd.ad_state, growerVyAd.ad_zip) ;   // Vineyard Address
             if  (growerVyAd.ad_attn) {
-              if (cont_arr.indexOf(growerAd.ad_name + growerVyAd.ad_attn + formatPhoneNumber(growerVyAd.ad_phone)) == -1) {
-                cont_arr = cont_arr + "|" + growerAd.ad_name + growerVyAd.ad_attn + formatPhoneNumber(growerVyAd.ad_phone);
-                qrowData[2]  = qrowData[2] + crlf + growerVyAd.ad_attn;
-                qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerVyAd.ad_phone);
+              if (formatPhoneNumber(growerAd.ad_phone) !== null) {
+                if (cont_arr.indexOf(growerAd.ad_name + growerVyAd.ad_attn + formatPhoneNumber(growerVyAd.ad_phone)) == -1) {
+                  cont_arr = cont_arr + "|" + growerAd.ad_name + growerVyAd.ad_attn + formatPhoneNumber(growerVyAd.ad_phone);
+                  qrowData[2]  = qrowData[2] + crlf + growerVyAd.ad_attn;
+                  qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerVyAd.ad_phone);
+                }
               }
             }
           }
