@@ -9,49 +9,36 @@ function isDefined(x) {
 }
 
 function loadAddress(ln1, ln2, ln3, cty, st, pc) {
-  var address = "";
+  var address    = "";
   var addressln4 = "";
+  var sep1       = "";
+  var sep2       = "";
 
   if ( ln1 !== 'undefined' && ln1.trim() !== "") {
     address = ln1.trim();
+    sep1 = crlf;
   }
   if ( ln2 !== 'undefined' && ln2.trim() !== "") {
-    if (address !== "") {
-      address = address + crlf + ln2.trim();
-    } else {
-      address = ln2.trim();
-    }
+    address = address + sep1 + ln2.trim();
+    sep1 = crlf;
   }
   if ( ln3 !== 'undefined' && ln3.trim() !== "") {
-    if (address !== "") {
-      address = address +  crlf + ln3.trim();
-    } else {
-      address = ln3.trim();
-    }
+    address = address + sep1 + ln3.trim();
+    sep1 = crlf;
   }
   if ( cty !== 'undefined' && cty.trim() !== "") {
     addressln4 = cty.trim();
+    sep2 = " ";
   }
   if ( st  !== 'undefined' && st.trim()  !== "") {
-    if (addressln4 !== "") {
-      addressln4 = addressln4 + "  " + st.trim();
-    } else {
-      addressln4 = st.trim();
-    }
+    addressln4 = addressln4 + sep2 + st.trim();
+    sep2 = " ";
   }
   if ( pc  !== 'undefined' && pc.trim()  !== "") {
-    if (addressln4 !== "") {
-      addressln4 = addressln4 + "  " + pc.trim();
-    } else {
-      addressln4 = pc.trim();
-    }
+    addressln4 = addressln4 + sep2 + pc.trim();
   }
   if ( addressln4 !== "") {
-    if (address !== "") {
-      address = address +  crlf + addressln4;
-    } else {
-      address = addressln4;
-    }
+    address = address + sep1 + addressln4;
   }
   return address;
 }
@@ -62,22 +49,22 @@ function loadContact(cnt, mob, phn, fax, eml) {
 
   if ( cnt !== 'undefined' && cnt.trim() !== "") {
     contact = cnt.trim();
+    sep = crlf;
   }
   if ( mob !== 'undefined' && mob.trim() !== "") {
-    if (contact !== "") { sep = crlf; } else { sep = ""; }
     contact = contact + sep + phonePrefix("(P)", formatPhoneNumber(mob));
+    sep = crlf;
   }
   if ( phn !== 'undefined' && phn.trim() !== "") {
-    if (contact !== "") { sep = crlf; } else { sep = ""; }
     contact = contact + sep + phonePrefix("(P)", formatPhoneNumber(phn));
+    sep = crlf;
   }
   if ( fax !== 'undefined' && fax.trim() !== "") {
-    if (contact !== "") { sep = crlf; } else { sep = ""; }
     contact = contact + sep + phonePrefix("(F)", formatPhoneNumber(fax));
+    sep = crlf;
   }
   if ( eml !== 'undefined' && eml.trim() !== "") {
-    if (contact !== "") { sep = crlf; } else { sep = ""; }
-    contact = contact +  sep + "(E) " + eml.trim();
+    contact = contact + sep + "(E) " + eml.trim();
   }
   return contact;
 }
@@ -124,7 +111,7 @@ function loadHAemail(em1, em2) {
 
 function formatPhoneNumber(s) {
   var s2 = (""+s).replace(/\D/g, '');
-  var m = [];
+  var m  = [];
   switch (s2.length) {
     case 8:
       m = s2.match(/^(\d{4})(\d{4})$/);
@@ -133,38 +120,38 @@ function formatPhoneNumber(s) {
       break;
     case 10:
       switch (s2.substr(0,2)) {
-    case '04':
-      m = s2.match(/^(\d{4})(\d{3})(\d{3})$/);
-      return (!m) ? null : "" + m[1] + " " + m[2] + " " + m[3];
-      // s2.substr(0,4)+" "+s2.substr(4,3)+" "+s2.substr(7,3);
-         default:
-           m = s2.match(/^(\d{2})(\d{4})(\d{4})$/);
-           return (!m) ? null : "(" + m[1] + ") " + m[2] + " " + m[3];
-           // "("+s2.substr(0,2)+") "+s2.substr(2,4)+" "+s2.substr(6,4);
-       }
-       break;
+        case '04':
+          m = s2.match(/^(\d{4})(\d{3})(\d{3})$/);
+          return (!m) ? null : "" + m[1] + " " + m[2] + " " + m[3];
+          // s2.substr(0,4)+" "+s2.substr(4,3)+" "+s2.substr(7,3);
+        default:
+          m = s2.match(/^(\d{2})(\d{4})(\d{4})$/);
+          return (!m) ? null : "(" + m[1] + ") " + m[2] + " " + m[3];
+          // "("+s2.substr(0,2)+") "+s2.substr(2,4)+" "+s2.substr(6,4);
+      }
+      break;
     default:
-       return (!s2) ? null : s2;
+      return (!s2) ? null : s2;
   }
   return (!s2) ? null : s2;
  }
 
 function formatPhoneNumberM(s) {
   var s2 = (""+s).replace(/\D/g, '');
-  var m = s2.match(/^(\d{4})(\d{3})(\d{3})$/);
+  var m  = s2.match(/^(\d{4})(\d{3})(\d{3})$/);
   return (!m) ? null : "" + m[1] + " " + m[2] + " " + m[3];
 }
 
 function formatPhoneNumberP(s) {
   var s2 = (""+s).replace(/\D/g, '');
-  var m = s2.match(/^(\d{2})(\d{4})(\d{4})$/);
+  var m  = s2.match(/^(\d{2})(\d{4})(\d{4})$/);
   return (!m) ? null : "(" + m[1] + ") " + m[2] + " " + m[3];
 }
 
 
 function serverUpload1(jsonData) {
   // try{
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss   = SpreadsheetApp.getActiveSpreadsheet();
     var data = []
 
     for (var i = 0; i < jsonData.ds_Grower.tt_gr_mstr.length; i++) {
@@ -313,7 +300,7 @@ function serverUpload1(jsonData) {
 
 function serverUpload2(jsonData) {
   // try{
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss    = SpreadsheetApp.getActiveSpreadsheet();
     var adata = []
 
     for (var i = 0; i < jsonData.ds_Grower.tt_gr_mstr.length; i++) {
@@ -510,11 +497,11 @@ function serverUpload2(jsonData) {
     /*
     adata = transpose(adata);
     */
-    var sheetname = "Grapeweb";
-    var sheet = ss.getSheetByName(sheetname);
-    var lastRow = sheet.getLastRow();
+    var sheetname  = "Grapeweb";
+    var sheet      = ss.getSheetByName(sheetname);
+    var lastRow    = sheet.getLastRow();
     var lastColumn = sheet.getLastColumn();
-    var range = sheet.getRange(2, 1, lastRow, lastColumn);
+    var range      = sheet.getRange(2, 1, lastRow, lastColumn);
     range.clearContent();
     adata.sort(function(a, b) {
       var c = a[46].toLowerCase(), d = b[46].toLowerCase();

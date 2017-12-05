@@ -9,6 +9,7 @@ function serverUpload3(jsonData) {
     var sep    = "";
     var hvFax1 = "";
     var email1 = "";
+    var qsep   = "";
 
     for (var i = 0; i < jsonData.ds_Grower.tt_gr_mstr.length; i++) {
       var grower = jsonData.ds_Grower.tt_gr_mstr[i];
@@ -84,17 +85,19 @@ function serverUpload3(jsonData) {
         growData[5]  = "" ; // Contact 3
         growData[6]  = loadHAemail(hvFax1, email1)  ; // Harvest Advice Fax/Email
         qrowData[0]  = growerAd.ad_name;
-        qrowData[2]  = growerAd.ad_attn;
-        qrowData[1]  = formatPhoneNumber(growerAd.ad_fax2);
         if (formatPhoneNumber(growerAd.ad_fax2) !== null) {
+          qrowData[2]  = growerAd.ad_attn;
+          qrowData[1]  = formatPhoneNumber(growerAd.ad_fax2);
           cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn + formatPhoneNumber(growerAd.ad_fax2);
+          qsep = crlf;
         }
         if (growerAd.ad_attn2) {
           if (formatPhoneNumber(growerAd.ad_phone2) !== null) {
             if (cont_arr.indexOf(growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.ad_phone2)) == -1) {
               cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.ad_phone2);
-              qrowData[2]  = qrowData[2] + crlf + growerAd.ad_attn2;
-              qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerAd.ad_phone2);    
+              qrowData[2]  = qrowData[2] + qsep + growerAd.ad_attn2;
+              qrowData[1]  = qrowData[1] + qsep + formatPhoneNumber(growerAd.ad_phone2);
+              qsep = crlf;
             }
           }
         }
@@ -123,8 +126,9 @@ function serverUpload3(jsonData) {
           if (formatPhoneNumber(growerAd.ad_phone) !== null) {
             if (cont_arr.indexOf(growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone)) == -1) {
               cont_arr = cont_arr + "|" + growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone);
-              qrowData[2]  = qrowData[2] + crlf + growerVdAd.ad_attn;
-              qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerVdAd.ad_phone);
+              qrowData[2]  = qrowData[2] + qsep + growerVdAd.ad_attn;
+              qrowData[1]  = qrowData[1] + qsep + formatPhoneNumber(growerVdAd.ad_phone);
+              qsep = crlf;
             }
           }
         }
@@ -408,8 +412,9 @@ function serverUpload3(jsonData) {
               if (formatPhoneNumber(growerAd.ad_phone) !== null) {
                 if (cont_arr.indexOf(growerAd.ad_name + growerVyAd.ad_attn + formatPhoneNumber(growerVyAd.ad_phone)) == -1) {
                   cont_arr = cont_arr + "|" + growerAd.ad_name + growerVyAd.ad_attn + formatPhoneNumber(growerVyAd.ad_phone);
-                  qrowData[2]  = qrowData[2] + crlf + growerVyAd.ad_attn;
-                  qrowData[1]  = qrowData[1] + crlf + formatPhoneNumber(growerVyAd.ad_phone);
+                  qrowData[2]  = qrowData[2] + qsep + growerVyAd.ad_attn;
+                  qrowData[1]  = qrowData[1] + qsep + formatPhoneNumber(growerVyAd.ad_phone);
+                  qsep = crlf;
                 }
               }
             }
