@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <script src="jquery-1.11.1.min.js"></script>
+    <script src="jquery-ui.min.js"></script>
+    <script src="jquery.select-to-autocomplete.js"></script>
+    <script>
+      (function($){
+        $(function(){
+          /* $('select').selectToAutocomplete();
+          $('form').submit(function(){
+            alert( $(this).serialize() );
+            return false;
+          });
+          */
+          google.script.run
+            .withSuccessHandler(onSuccess)
+            .getBlockIDsFromSheet();
+
+        });
+      })(jQuery);
+    </script>
+    <link rel="stylesheet" href="jquery-ui.css">
+    <style>
+      body {
+        font-family: Arial, Verdana, sans-serif;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Select Blocks</p>
+      <hr>
+      <div>
+        <form>
+          <table>
+            <tr>
+            <td>Select A Block</td>
+            <td>
+              <select id="block_list"></select>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="submit" value="Submit" onclick="myFunction()"></td>
+          </tr>
+        </table>
+      </form>
+    </div>
+    <script type="text/javascript">
+        // Client-side JavaScript that uses the list returned by
+        // GAS function "getValuesForRngName()" to populate the dropdown.
+        // This is standard client-side JavaScript programming that uses
+        // DOM manipulation to get page elements and manipulate them.
+        function onSuccess(values) {
+          var opt,
+              dropDown;
+            for(i = 0;i < values.length; i +=1){
+              dropDown = document.getElementById("block_list");
+              opt = document.createElement("option");
+              dropDown.options.add(opt);
+              // Remember that GAS Range method "GetValues()" returns
+              // an array of arrays, hence two array indexes "[i][0]" here.
+              opt.text = values[i][0];
+              opt.value = values[i][0];
+           }
+        }
+        function populate(){
+          google.script.run.withSuccessHandler(onSuccess).getBlockIDsFromSheet();
+        }
+        function myFunction() {
+          var x = document.getElementById("block_list").value;
+          google.script.run.functionToRunOnFormSubmit(x);
+          google.script.host.close();
+        }
+    </script>
+    <script>
+      // Using the "load" event to execute the function "populate"
+      window.addEventListener('load', populate);
+    </script>
+  </body>
+</html>
