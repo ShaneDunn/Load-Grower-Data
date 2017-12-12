@@ -31,20 +31,6 @@ function getLastRow(sheet, column) {
   return newarr.length;
 };
 
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function (obj, fromIndex) {
-    if (fromIndex == null) {
-        fromIndex = 0;
-    } else if (fromIndex < 0) {
-        fromIndex = Math.max(0, this.length + fromIndex);
-    }
-    for (var i = fromIndex, j = this.length; i < j; i++) {
-        if (this[i] === obj)
-            return i;
-    }
-    return -1;
-  };
-}
 
 function getBlockIDsFromSheet() {
   var ss = SpreadsheetApp.getActive();
@@ -64,35 +50,58 @@ function getBlockIDsFromSheet() {
  // logSheet.getRange(1, 1, idGroupsArrayLength, 48).setValues(idGroups);
  // logSheet.getRange(1, 50, 12, 2).setValues(mapGroups);
 
-
   Logger.log(mapGroups);
   
   for (var i = 0; i < blockIDs.length - 1; i++)
   {
-    // get Group ID and name
-    var thisRow = idGroups[i];
-    // ui.alert(thisRow[46]);
-    // logSheet.getRange(2, 46, 1, 1).setValues(thisRow[46]);
-    var idx1 = idGroups.indexOf(blockIDs[i][0],30);
-    if ( idx1 && idGroups ) {
-      thisRow = idGroups[idx1];
-      if (typeof myVar != 'undefined') {var groupID = thisRow[intCol];};
+    var groupID = '';
+    var groupDesc = '';
+    var blockCode = '';
+    var idx1 = -1;
+    var idx2 = -1;
+
+    if (typeof idGroups != 'undefined') {
+      for (var n = 0; n < idGroups.length; n++) {
+        for (var m = 0; m < idGroups[n].length; m++) {
+          if (idGroups[n][m] == blockIDs[i][0]) break
+        }
+        if (idGroups[n][m] == blockIDs[i][0]) break
+      }
+      blockCode = idGroups[n][32];
+      groupID = idGroups[n][46];
+      idx1 = n;
     }
-    var idx2 = mapGroups.indexOf(groupID,0);
-    if ( idx2 ) { var groupDesc = mapGroups[idx2][1]; }
+    n = 0;
+    m = 0;
 
-    Logger.log(idx1);
-    Logger.log(idx2);
-    ui.alert(':' + idx1 + ':' + idx2 + ':' );
-
+    if (typeof mapGroups != 'undefined' && idx1 >= 0 ) {
+      for (var n = 0; n < mapGroups.length; n++) {
+        for (var m = 0; m < mapGroups[n].length; m++) {
+          if (mapGroups[n][m] == groupID) break
+        }
+        if (mapGroups[n][m] == groupID) break
+      }
+      groupDesc = mapGroups[n][1];
+      idx2 = n;
+    }
+    
     newRow = [];
     if ( blockIDs[i] && idx1 && idx2 ) {
-      newRow.push(blockIDs[i]);
+      newRow.push(blockIDs[i][0]);
       newRow.push(groupID);
       newRow.push(groupDesc);
+      newRow.push(blockCode);
       selectArray.push(newRow);
     }    
   }
+    selectArray.sort(function(a, b) {
+      var c = a[1], d = b[1];
+      if(c === d) {
+        var x = a[3], y = b[3];
+        return x < y ? -1 : x > y ? 1 : 0;
+      }
+      return c < d ? -1 : c > d ? 1 : 0;
+    });
 
   return selectArray;
 };

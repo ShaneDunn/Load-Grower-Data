@@ -1,167 +1,124 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-    <style type="text/css">
-      HTML {
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 12px;
-      }
-
-      H2 {
-        font-size: 14px;
-        font-weight: bold;
-        margin: 1em 0em .25em 0em;
-      }
-
-      P {
-        margin: 1em 0em;
-      }
-    </style>
-    <style>
-      body {
-        font-family: Arial, Verdana, sans-serif;
-        font-size: 13px;
-      }
-    </style>
-
-    <!--
-    <script src="https://rawgithub.com/ehynds/jquery-ui-multiselect-widget/master/src/jquery.multiselect.js"></script>
-    <script type="text/javascript">
-      $(document).ready( function() {
-        $("#control_1").multiSelect();
-      });
-    </script>  -->
-    
-    <script>
-      (function($){
-        $(function(){
-          /* $('select').selectToAutocomplete();
-          $('form').submit(function(){
-            alert( $(this).serialize() );
-            return false;
-          });
-          */
-          google.script.run
-            .withSuccessHandler(onSuccess)
-            .getBlockIDsFromSheet();
-
-        });
-      })(jQuery);
-    </script>
-
-  </head>
-  <body>
-			<h2>Control 1: Default options</h2>
-			<p>
-				<select id="control_1" name="control_1[]" multiple="multiple" size="5">
-					<option value=""></option>
-					<optgroup label="Optgroup 1">
-						<option value="option_1">Option 1</option>
-						<option value="option_2">Option 2</option>
-					</optgroup>
-					<optgroup label="Optgroup 2">
-						<option value="option_3">Option 3</option>
-						<option value="option_4">Option 4</option>
-						<option value="option_5">Option 5</option>
-						<option value="option_6">Option 6</option>
-						<option value="option_7">Option 7</option>
-						<option value="option_8">Option 8</option>
-					</optgroup>
-
-					<optgroup label="Optgroup 3">
-						<option value="option_9">Option 9</option>
-						<option value="option_10">Option 10</option>
-						<option value="option_11">Option 11</option>
-						<option value="option_12">Option 12</option>
-					</optgroup>
-				</select>
-			</p>
-
-
-
+   <head>
+      <base target="_top">
+      <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+      <style type="text/css">
+         HTML {
+         font-family: Arial, Helvetica, sans-serif;
+         font-size: 12px;
+         }
+         H2 {
+         font-size: 14px;
+         font-weight: bold;
+         margin: 1em 0em .25em 0em;
+         }
+         P {
+         margin: 1em 0em;
+         }
+      </style>
+      <style>
+         body {
+         font-family: Arial, Verdana, sans-serif;
+         font-size: 13px;
+         }
+      </style>
+      <!--
+         <script src="https://rawgithub.com/ehynds/jquery-ui-multiselect-widget/master/src/jquery.multiselect.js"></script>
+         <script type="text/javascript">
+           $(document).ready( function() {
+             $("#control_1").multiSelect();
+           });
+         </script>  -->
+      <script>
+         (function($){
+           $(function(){
+             /* $('select').selectToAutocomplete();
+             $('form').submit(function(){
+               alert( $(this).serialize() );
+               return false;
+             });
+             */
+             google.script.run
+               .withSuccessHandler(onSuccess)
+               .getBlockIDsFromSheet();
+         
+           });
+         })(jQuery);
+      </script>
+   </head>
+   <body>
+      <h2>Control 1: Default options</h2>
       <p>Select Blocks</p>
       <hr>
       <div>
-        <form>
-          <table>
-            <tr>
-            <td>Select A Block</td>
-            <td>
-              <select id="block_list"></select>
-            </td>
-          </tr>
-          <tr>
-            <td><input type="submit" value="Submit" onclick="myFunction()"></td>
-          </tr>
-        </table>
-      </form>
-    </div>
-    <script type="text/javascript">
-        // Client-side JavaScript that uses the list returned by
-        // GAS function "getValuesForRngName()" to populate the dropdown.
-        // This is standard client-side JavaScript programming that uses
-        // DOM manipulation to get page elements and manipulate them.
-        $('#control_1').change(function(){
-          console.log($(this).val());  // this will give values of selected option by array
-        });
-
-        function onSuccess(values) {
-          var opt,
-              optg,
-              dropDown;
-          var lastGroup = '';
-          dropDown = document.getElementById("block_list");
-          for(var i = 0; i < values.length; i +=1){
-            console.log(values[i]);
-            if (lastGroup === values[i][1]) {
-
-            } else {
-              lastGroup = values[i][1];
-              optg = document.createElement("optgroup");
-              optg.label = values[i][1] + ' - ' + values[i][2];
-              dropDown.appendChild(optg);
-            }
-            opt = document.createElement("option");
-            opt.text = values[i][0];
-            opt.value = values[i][0];
-            optg.appendChild(opt);
-          }
-        }
-
-        function populate(){
-          google.script.run.withSuccessHandler(onSuccess).getBlockIDsFromSheet();
-        }
-
-        function myFunction() {
-          // var x = document.getElementById("block_list").value;
-          // var x = document.getElementById("control_1").value();
-          var selectedValues = $('#control_1').val();
-          // x = x.serialise();
-          
-          // var selO = document.getElementById("control_1")[0];
-          // var selValues = [];
-          // for(var i=0; i < selO.length; i++){
-          //   if(selO.options[i].selected){
-          //     selValues.push(selO.options[i].value);
-          //   }
-          // }
-          if ( selectedValues ) { google.script.run.functionToRunOnFormSubmit(selectedValues.join());
-          }
-          else { google.script.run.functionToRunOnFormSubmit('');
-          }
-          google.script.host.close();
-        }
-    </script>
-    <script>
-      // Using the "load" event to execute the function "populate"
-      window.addEventListener('load', populate);
-    </script>
-  </body>
+         <form>
+            <table>
+               <tr>
+                  <td>
+                     <select id="block_list" name="block_list[]" multiple="multiple" size="10"></select>
+                  </td>
+               </tr>
+               <tr>
+                  <td>
+                    <input type="submit" value="Submit" onclick="myFunction()">
+                  </td>
+               </tr>
+            </table>
+         </form>
+      </div>
+      <script type="text/javascript">
+         // Client-side JavaScript that uses the list returned by
+         // GAS function "getValuesForRngName()" to populate the dropdown.
+         // This is standard client-side JavaScript programming that uses
+         // DOM manipulation to get page elements and manipulate them.
+         $('#control_1').change(function(){
+           console.log($(this).val());  // this will give values of selected option by array
+         });
+         
+         function onSuccess(values) {
+           var opt,
+               optg,
+               dropDown;
+           var lastGroup = '';
+           dropDown = document.getElementById("block_list");
+           for(var i = 0; i < values.length; i +=1){
+             console.log(values[i]);
+             if (lastGroup === values[i][1]) {
+         
+             } else {
+               lastGroup = values[i][1];
+               optg = document.createElement("optgroup");
+               optg.label = values[i][1] + ' - ' + values[i][2];
+               dropDown.appendChild(optg);
+             }
+             opt = document.createElement("option");
+             opt.text = values[i][3];
+             opt.value = values[i][0];
+             optg.appendChild(opt);
+           }
+         }
+         
+         function populate(){
+           google.script.run.withSuccessHandler(onSuccess).getBlockIDsFromSheet();
+         }
+         
+         function myFunction() {
+           var selectedValues = $('#block_list').val();
+           console.log(selectedValues);
+           if ( selectedValues ) { google.script.run.functionToRunOnFormSubmit(selectedValues.join(';'));
+           }
+           else { google.script.run.functionToRunOnFormSubmit('');
+           }
+           google.script.host.close();
+         }
+      </script>
+      <script>
+         // Using the "load" event to execute the function "populate"
+         window.addEventListener('load', populate);
+      </script>
+   </body>
 </html>
