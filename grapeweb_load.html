@@ -11,6 +11,10 @@
          font-family: Arial, Helvetica, sans-serif;
          font-size: 12px;
          }
+         body {
+         font-family: Arial, Verdana, sans-serif;
+         font-size: 12px;
+         }
          H2 {
          font-size: 14px;
          font-weight: bold;
@@ -18,12 +22,6 @@
          }
          P {
          margin: 1em 0em;
-         }
-      </style>
-      <style>
-         body {
-         font-family: Arial, Verdana, sans-serif;
-         font-size: 13px;
          }
       </style>
       <!--
@@ -42,10 +40,13 @@
                return false;
              });
              */
+             $('#glass').show();
+             $('#loading').show();
              google.script.run
                .withSuccessHandler(onSuccess)
                .getBlockIDsFromSheet();
-         
+             $('#loading').hide();
+             $('#glass').hide();
            });
          })(jQuery);
       </script>
@@ -54,7 +55,9 @@
       <h2>Control 1: Default options</h2>
       <p>Select Blocks</p>
       <hr>
-      <div>
+      <div id='glass' style="background-color: rgb(237, 237, 236); z-index: 2; opacity: 0.75; position: absolute;"></div>
+      <div id='loading' style='z-index: 3; top: 50%; left: 50%; position: absolute;'><img src='https://ssl.gstatic.com/ui/v1/activityindicator/loading_bg_f5.gif'></div>
+      <div id='fullBody'>
          <form>
             <table>
                <tr>
@@ -116,9 +119,10 @@
            google.script.host.close();
          }
       </script>
+      <!--
       <script>
          // Using the "load" event to execute the function "populate"
          window.addEventListener('load', populate);
-      </script>
+      </script>  -->
    </body>
 </html>

@@ -1,21 +1,38 @@
 function getNewBlocks() {
-  getBlockIDs();
-  removeBlockIDs();
-  loadSheet();
-  exportSheet();
-};
-
-function removeBlockIDs() {
   var ss      = SpreadsheetApp.getActiveSpreadsheet();
   var htmlDlg = HtmlService.createHtmlOutputFromFile('grapeweb_load').setSandboxMode(HtmlService.SandboxMode.IFRAME);
   ss.show(htmlDlg);
 };
 
 function functionToRunOnFormSubmit(fromInputForm) {
-  var ss = SpreadsheetApp.getActive();
   Logger.log(fromInputForm);
-  ss.getSheetByName("Grapeweb_Load").getRange(2, 2, 1, 1).setValue(fromInputForm);
-  ss.getSheetByName("Grapeweb_Load").getRange(3, 3, 1, 1).setValue("hhf");
+  var ss         = SpreadsheetApp.getActive();
+  var gwSheet    = ss.getSheetByName("Grapeweb");
+  var glSheet    = ss.getSheetByName("Grapeweb_Load");
+  var gwSheetLen = getLastRow(gwSheet, "C");
+  var gwSheetIDs = gwSheet.getRange(1, 1, gwSheetLen, 48).getValues();
+  var gwSheetID  = gwSheetIDs.map(function(value,index) { return value[30]; });
+  var newIds     = fromInputForm.split(";");
+  var newRow     = [];
+  var glArray    = [];
+
+  for (var i = 0; i < newIds.length; i++)
+  {
+    var idx1 = -1;
+    newRow   = [];
+
+    if (gwSheetID.indexOf(newIds[i].toString()) > -1) {
+      idx1 = gwSheetID.indexOf(newIds[i].toString());
+      newRow.push(gwSheetIDs[idx1]);
+      glArray.push(gwSheetIDs[idx1]);
+    }
+  }
+  Logger.log(glArray);
+  Logger.log(glArray.length);
+  Logger.log(glArray[0].length);
+  
+  glSheet.getRange(2, 1, glArray.length, glArray[0].length).setValues(glArray);
+  
 };
 
 function getLastRow(sheet, column) {
@@ -34,7 +51,6 @@ function getLastRow(sheet, column) {
 
 function getBlockIDsFromSheet() {
   var ss = SpreadsheetApp.getActive();
-  var logSheet             = ss.getSheetByName("sheet15");
   var mappingSheet         = ss.getSheetByName("Grapeweb ID Mapping");
   var gwSheet              = ss.getSheetByName("Grapeweb");
   var blockIDsArrayLength  = getLastRow(mappingSheet, "G");
@@ -47,12 +63,12 @@ function getBlockIDsFromSheet() {
   var selectArray = [];
   var intCol = 46;
   var ui = SpreadsheetApp.getUi();
- // logSheet.getRange(1, 1, idGroupsArrayLength, 48).setValues(idGroups);
- // logSheet.getRange(1, 50, 12, 2).setValues(mapGroups);
 
-  Logger.log(mapGroups);
+  var idGroup =  idGroups.map(function(value,index) { return value[30]; });
+  var mapGroup =  mapGroups.map(function(value,index) { return value[0]; });
+  Logger.log(mapGroup);
   
-  for (var i = 0; i < blockIDs.length - 1; i++)
+  for (var i = 0; i < blockIDs.length; i++)
   {
     var groupID = '';
     var groupDesc = '';
@@ -60,48 +76,36 @@ function getBlockIDsFromSheet() {
     var idx1 = -1;
     var idx2 = -1;
 
-    if (typeof idGroups != 'undefined') {
-      for (var n = 0; n < idGroups.length; n++) {
-        for (var m = 0; m < idGroups[n].length; m++) {
-          if (idGroups[n][m] == blockIDs[i][0]) break
-        }
-        if (idGroups[n][m] == blockIDs[i][0]) break
-      }
-      blockCode = idGroups[n][32];
-      groupID = idGroups[n][46];
-      idx1 = n;
+    if (idGroup.indexOf(blockIDs[i][0].toString()) > -1) {
+      idx1 = idGroup.indexOf(blockIDs[i][0].toString());
+      blockCode = idGroups[idx1][32];
+      groupID = idGroups[idx1][46];
     }
-    n = 0;
-    m = 0;
 
-    if (typeof mapGroups != 'undefined' && idx1 >= 0 ) {
-      for (var n = 0; n < mapGroups.length; n++) {
-        for (var m = 0; m < mapGroups[n].length; m++) {
-          if (mapGroups[n][m] == groupID) break
-        }
-        if (mapGroups[n][m] == groupID) break
+    if (idx1 > -1) {
+      if (mapGroup.indexOf(groupID) > -1) {
+        idx2 = mapGroup.indexOf(groupID);
+        groupDesc = mapGroups[idx2][1];
       }
-      groupDesc = mapGroups[n][1];
-      idx2 = n;
     }
-    
+
     newRow = [];
-    if ( blockIDs[i] && idx1 && idx2 ) {
+    if ( idx1 > -1 && idx2 > -1 ) {
       newRow.push(blockIDs[i][0]);
       newRow.push(groupID);
       newRow.push(groupDesc);
       newRow.push(blockCode);
       selectArray.push(newRow);
-    }    
+    }
   }
-    selectArray.sort(function(a, b) {
-      var c = a[1], d = b[1];
-      if(c === d) {
-        var x = a[3], y = b[3];
-        return x < y ? -1 : x > y ? 1 : 0;
-      }
-      return c < d ? -1 : c > d ? 1 : 0;
-    });
+  selectArray.sort(function(a, b) {
+    var c = a[1], d = b[1];
+    if(c === d) {
+      var x = a[3], y = b[3];
+      return x < y ? -1 : x > y ? 1 : 0;
+    }
+    return c < d ? -1 : c > d ? 1 : 0;
+  });
 
   return selectArray;
 };
