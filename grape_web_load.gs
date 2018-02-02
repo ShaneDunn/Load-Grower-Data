@@ -5,7 +5,7 @@ function getNewBlocks() {
 };
 
 function functionToRunOnFormSubmit(fromInputForm) {
-  Logger.log(fromInputForm);
+  // Logger.log(fromInputForm);
   var ss         = SpreadsheetApp.getActive();
   var gwSheet    = ss.getSheetByName("Grapeweb");
   var glSheet    = ss.getSheetByName("Grapeweb_Load");
@@ -27,9 +27,9 @@ function functionToRunOnFormSubmit(fromInputForm) {
       glArray.push(gwSheetIDs[idx1]);
     }
   }
-  Logger.log(glArray);
-  Logger.log(glArray.length);
-  Logger.log(glArray[0].length);
+  // Logger.log(glArray);
+  // Logger.log(glArray.length);
+  // Logger.log(glArray[0].length);
   
   glSheet.getRange(2, 1, glArray.length, glArray[0].length).setValues(glArray);
   

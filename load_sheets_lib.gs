@@ -70,13 +70,16 @@ function loadContact(cnt, mob, phn, fax, eml) {
 }
 
 function phonePrefix(prefix, number) {
-  switch (number.substr(0,2)) {
-    case '04':
-      return "(M) " + number.trim();
-    default:
-      return prefix + " " + number.trim();
+  if (typeof(number) !== 'undefined' && number !== null && number.trim() !== "") {
+    switch (number.substr(0,2)) {
+      case '04':
+        return "(M) " + number.trim();
+      default:
+        return prefix + " " + number.trim();
+    }
+    return prefix + " " + number.trim();
   }
-  return prefix + " " + number.trim();
+  return "";
 }
 
 function loadAddress2(ln1, ln2) {

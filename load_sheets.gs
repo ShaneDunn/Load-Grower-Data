@@ -456,6 +456,7 @@ function serverUpload3(jsonData) {
         }
       }
       qdata.push(qrowData);
+
       growerAd    = null; // Grower Address
       growerVd    = null; // Supplier Details
       growerVdAd  = null; // Remit-to Details
@@ -542,6 +543,46 @@ function serverUpload3(jsonData) {
       return c < d ? -1 : c > d ? 1 : 0;
     });
     sheet.getRange(2,1,adata.length,adata[0].length).setValues(adata);
+    
+    // load contactor contacts
+    
+    for (var r=0; r<gdata.length; r++) {
+      if ( gdata[r][7] != '' ) {
+        if (cntr_arr.indexOf(gdata[r][7] + gdata[r][8] + gdata[r][9] + gdata[r][10]) == -1) {
+          cntr_arr = cntr_arr + "|" + gdata[r][7] + gdata[r][8] + gdata[r][9] + gdata[r][10];
+          crowData[0] = gdata[r][7];
+          crowData[1] = gdata[r][8];
+          crowData[2] = gdata[r][9];
+          crowData[3] = gdata[r][10];
+          cdata.push(crowData);
+        }
+      }
+       if ( gdata[r][11] != '' ) {
+        if (cntr_arr.indexOf(gdata[r][11] + gdata[r][12] + gdata[r][13] + gdata[r][14]) == -1) {
+          cntr_arr = cntr_arr + "|" + gdata[r][11] + gdata[r][12] + gdata[r][13] + gdata[r][14];
+          crowData[0] = gdata[r][11];
+          crowData[1] = gdata[r][12];
+          crowData[2] = gdata[r][13];
+          crowData[3] = gdata[r][14];
+          cdata.push(crowData);
+        }
+      }
+   }
+    sheetname = "Contractors";
+    sheet = ss.getSheetByName(sheetname);
+    lastRow = sheet.getLastRow();
+    lastColumn = sheet.getLastColumn();
+    range = sheet.getRange(2, 1, lastRow, lastColumn);
+    cdata.sort(function(a, b) {
+      var c = a[1].toLowerCase(), d = b[1].toLowerCase();
+      if(c === d) {
+        var x = a[0].toLowerCase(), y = b[0].toLowerCase();
+        return x < y ? -1 : x > y ? 1 : 0;
+      }
+      return c < d ? -1 : c > d ? 1 : 0;
+    });
+    range.clearContent();
+    sheet.getRange(2,1,cdata.length,cdata[0].length).setValues(cdata);
 
     return 'Completed';
   /*
