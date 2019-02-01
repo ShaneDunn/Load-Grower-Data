@@ -90,7 +90,7 @@ function loadAddress2(ln1, ln2) {
   }
   if ( ln2 !== 'undefined' && ln2.trim() !== "") {
     if (address !== "") {
-      address = address + ", " + ln2.trim();
+      address = address + " " + ln2.trim();
     } else {
       address = ln2.trim();
     }
@@ -98,16 +98,19 @@ function loadAddress2(ln1, ln2) {
   return address;
 }
 
-function loadHAemail(em1, em2) {
+function loadHAemail(em1) {
   var contact = "";
   var sep     = "";
 
   if ( em1 !== 'undefined' && em1.trim() !== "") {
     contact = em1.trim();
-  }
-  if ( em2 !== 'undefined' && em2.trim() !== "") {
-    if (contact !== "") { sep = crlf; } else { sep = ""; }
-    contact = contact + sep + em2.trim();
+    if (contact.indexOf(",") !== -1) {
+      contact = contact.replace(/,/g , " ");
+    }
+    if (contact.indexOf(" ") !== -1) {
+      sep = crlf;
+      contact = contact.replace(/ +/g , sep);
+    }
   }
   return contact;
 }
@@ -116,6 +119,11 @@ function formatPhoneNumber(s) {
   var s2 = (""+s).replace(/\D/g, '');
   var m  = [];
   switch (s2.length) {
+    case 6:
+      m = s2.match(/^(\d{2})(\d{4})$/);
+      return (!m) ? null : m[1] + " " + m[2];
+      // s2.substr(0,4)+" "+s2.substr(4,4);
+      break;
     case 8:
       m = s2.match(/^(\d{4})(\d{4})$/);
       return (!m) ? null : "(00) " + m[1] + " " + m[2];
@@ -123,6 +131,7 @@ function formatPhoneNumber(s) {
       break;
     case 10:
       switch (s2.substr(0,2)) {
+        case '13':
         case '04':
           m = s2.match(/^(\d{4})(\d{3})(\d{3})$/);
           return (!m) ? null : "" + m[1] + " " + m[2] + " " + m[3];
@@ -150,6 +159,285 @@ function formatPhoneNumberP(s) {
   var m  = s2.match(/^(\d{2})(\d{4})(\d{4})$/);
   return (!m) ? null : "(" + m[1] + ") " + m[2] + " " + m[3];
 }
+
+function formatGwEmail(email, first, last) {
+  var em1 = "";
+  if ( first !== 'undefined' && first.trim() !== "") {
+    first = "Unknown";
+  }
+  if ( last !== 'undefined' && last.trim() !== "") {
+    last = "Person";
+  }
+  Logger.log("Email: %s| First: %s| Last: %s|", email, first, last);
+  if ( email !== 'undefined' && email.trim() !== "") {
+    // Logger.log("Index: %s| Logical: %s",email.indexOf("@"), (email.indexOf("@") !== -1));
+    if (email.indexOf("@") != -1) {
+      var em2 = email.split("@");
+      if (email == "acc_pay@debortoli.com.au") {
+        em1 = first + "_" + last + "@nomail.com";
+      } else {
+        em1 = email.trim();
+      }
+    } else { // a fax no
+      em1 = first + "_" + last + "@nomail.com";
+    }
+  } else {
+    em1 = first + "_" + last + "@nomail.com";
+  }
+  return em1;
+}
+
+function getVarietyMap(variety) {
+  var gwVariety = "";
+  switch (variety) {
+    case 'Arneis'                  : gwVariety = "Arneis"             ; break;
+    case 'Barbera'                 : gwVariety = "Barbera"            ; break;
+    case 'Brown Frontignac'        : gwVariety = "Brown Muscat"       ; break;
+    case 'Cabernet Franc'          : gwVariety = "Cabernet Franc"     ; break;
+    case 'Cabernet Sauvignon'      : gwVariety = "Cabernet Sauvignon" ; break;
+    case 'Cardinal'                : gwVariety = "Cardinal"           ; break;
+    case 'Carmenere'               : gwVariety = "Carmenere"          ; break;
+    case 'Chambourcin'             : gwVariety = "Chambourcin"        ; break;
+    case 'Chardonnay'              : gwVariety = "Chardonnay"         ; break;
+    case 'Chenin Blanc'            : gwVariety = "Chenin Blanc"       ; break;
+    case 'Colombard'               : gwVariety = "Colombard"          ; break;
+    case 'Cornichon'               : gwVariety = "Purple Cornichon"   ; break;
+    case 'Crouchen'                : gwVariety = "Crouchen"           ; break;
+    case 'Currant (Carina)'        : gwVariety = "Carina Currants"    ; break;
+    case 'Currant (Zante)'         : gwVariety = "Zante Currant"      ; break;
+    case 'Dolcetto'                : gwVariety = "Dolcetto"           ; break;
+    case 'Doradillo'               : gwVariety = "Doradillo"          ; break;
+    case 'Durif'                   : gwVariety = "Durif"              ; break;
+    case 'Fiano'                   : gwVariety = "Fiano"              ; break;
+    case 'Flame Seedless'          : gwVariety = "Flame Seedless"     ; break;
+    case 'Fresh Mixed Red'         : gwVariety = "Not Mapped"         ; break;
+    case 'Fresh Mixed White'       : gwVariety = "Not Mapped"         ; break;
+    case 'Frontignan Red'          : gwVariety = "Red Frontignac"     ; break;
+    case 'Frontignan White'        : gwVariety = "White Frontignac"   ; break;
+    case 'Gamay'                   : gwVariety = "Gamay"              ; break;
+    case 'Greco'                   : gwVariety = "Greco di Tufo"      ; break;
+    case 'Grenache'                : gwVariety = "Grenache"           ; break;
+    case 'Grenache Blanc'          : gwVariety = "Grenache gris"      ; break;
+    case 'Malbec'                  : gwVariety = "Malbec"             ; break;
+    case 'Marsanne'                : gwVariety = "Marsanne"           ; break;
+    case 'Marzemino'               : gwVariety = "Marzemino"          ; break;
+    case 'Mataro'                  : gwVariety = "Mataro"             ; break;
+    case 'Menindee Seedless'       : gwVariety = "Menindee Seedless"  ; break;
+    case 'Merlot'                  : gwVariety = "Merlot"             ; break;
+    case 'Montepulciano'           : gwVariety = "Montepulciano"      ; break;
+    case 'Moscato Giallo'          : gwVariety = "Moscato Giallo"     ; break;
+    case 'Muscadelle'              : gwVariety = "Muscadelle"         ; break;
+    case 'Muscat Gordo Blanco'     : gwVariety = "Muscat Gordo Blanco"; break;
+    case 'Muscat Hamburg'          : gwVariety = "Muscat"             ; break;
+    case 'Muscat Rouge a Petit Gr' : gwVariety = "Muscat Petit Grains"; break;
+    case 'Nebbiolo'                : gwVariety = "Nebbiolo"           ; break;
+    case 'Palomino'                : gwVariety = "Palomino"           ; break;
+    case 'Pedro Ximenes'           : gwVariety = "Pedro Ximenes"      ; break;
+    case 'Petit Verdot'            : gwVariety = "Petit Verdot"       ; break;
+    case 'Pinot Blanc'             : gwVariety = "Pinot Blanc"        ; break;
+    case 'Pinot Gris'              : gwVariety = "Pinot Gris"         ; break;
+    case 'Pinot Meunier'           : gwVariety = "Pinot Meunier"      ; break;
+    case 'Pinot Noir'              : gwVariety = "Pinot Noir"         ; break;
+    case 'Prosecco'                : gwVariety = "Prosecco"           ; break;
+    case 'Red Emperor'             : gwVariety = "Red Emperor"        ; break;
+    case 'Ribier'                  : gwVariety = "Ribier"             ; break;
+    case 'Riesling'                : gwVariety = "Riesling"           ; break;
+    case 'Roussanne'               : gwVariety = "Roussanne"          ; break;
+    case 'Ruby Cabernet'           : gwVariety = "Ruby Cabernet"      ; break;
+    case 'Ruby Seedless'           : gwVariety = "Ruby Seedless"      ; break;
+    case 'Sangiovese'              : gwVariety = "Sangiovese"         ; break;
+    case 'Sauvignon Blanc'         : gwVariety = "Sauvignon Blanc"    ; break;
+    case 'Savagnin'                : gwVariety = "Savagnin"           ; break;
+    case 'Semillon'                : gwVariety = "Semillon"           ; break;
+    case 'Shiraz'                  : gwVariety = "Shiraz"             ; break;
+    case 'Sultana'                 : gwVariety = "Sultana"            ; break;
+    case 'Taminga'                 : gwVariety = "Taminga"            ; break;
+    case 'Tarrango'                : gwVariety = "Tarrango"           ; break;
+    case 'Tempranillo'             : gwVariety = "Tempranillo"        ; break;
+    case 'Tinta Cao'               : gwVariety = "Tinta Cao"          ; break;
+    case 'Tokay'                   : gwVariety = "Tokay"              ; break;
+    case 'Touriga Nacional'        : gwVariety = "Touriga"            ; break;
+    case 'Traminer'                : gwVariety = "Traminer"           ; break;
+    case 'Trebbiano'               : gwVariety = "Trebbiano"          ; break;
+    case 'Troya'                   : gwVariety = "Jacquez"            ; break;
+    case 'Verdelho'                : gwVariety = "Verdelho"           ; break;
+    case 'Vermentino'              : gwVariety = "Vermentino"         ; break;
+    case 'Viognier'                : gwVariety = "Viognier"           ; break;
+    case 'Waltham Cross'           : gwVariety = "Waltham Cross"      ; break;
+    case 'Zinfandel'               : gwVariety = "Zinfandel"          ; break;
+    default: gwVariety = variety;
+  }
+  return gwVariety;
+}
+
+function getRegionMap(region) {
+  var gwRegion = "";
+  switch (region) {
+    case 'New South Wales': gwRegion = "NSW - Unspecified"; break;
+    case 'Big Rivers': gwRegion = "NSW - Big Rivers"; break;
+    case 'Murray Darling-NSW': gwRegion = "NSW - Murray Darling"; break;
+    case 'Perricoota': gwRegion = "NSW - Perricoota"; break;
+    case 'Riverina': gwRegion = "NSW - Riverina"; break;
+    case 'Swan Hill-NSW': gwRegion = "NSW - Swan Hill"; break;
+    case 'Central Ranges': gwRegion = "NSW - Central Ranges"; break;
+    case 'Cowra': gwRegion = "NSW - Cowra"; break;
+    case 'Mudgee': gwRegion = "NSW - Mudgee"; break;
+    case 'Orange': gwRegion = "NSW - Orange"; break;
+    case 'Hunter Valley': gwRegion = "NSW - Hunter Valley"; break;
+    case 'Hunter': gwRegion = "NSW - Hunter"; break;
+    case 'Broke Fordwich': gwRegion = "NSW - Hunter (Broke Fordwich)"; break;
+    case 'Pokolbin': gwRegion = "NSW - Hunter (Pokolbin)"; break;
+    case 'Upper Hunter Valley': gwRegion = "NSW - Hunter (Upper Hunter Valley)"; break;
+    case 'Northern Rivers': gwRegion = "NSW - Northern Slopes"; break;
+    case 'Hastings River': gwRegion = "NSW - Hastings River"; break;
+    case 'Northern Slopes': gwRegion = "NSW - Northern Slopes"; break;
+    case 'New England Australia': gwRegion = "NSW - New England Australia"; break;
+    case 'South Coast': gwRegion = "NSW - South Coast"; break;
+    case 'Shoalhaven Coast': gwRegion = "NSW - Shoalhaven Coast"; break;
+    case 'Southern Highlands': gwRegion = "NSW - Southern Highlands"; break;
+    case 'Southern New South Wales': gwRegion = "NSW - Southern New South Wales"; break;
+    case 'Canberra District': gwRegion = "NSW - Canberra District"; break;
+    case 'Gundagai': gwRegion = "NSW - Gundagai"; break;
+    case 'Hilltops': gwRegion = "NSW - Hilltops"; break;
+    case 'Tumbarumba': gwRegion = "NSW - Tumbarumba"; break;
+    case 'Western Plains': gwRegion = "NSW - Western Plains"; break;
+    case 'Victoria': gwRegion = "VIC - Unspecified"; break;
+    case 'Central Victoria': gwRegion = "VIC - Central Victoria"; break;
+    case 'Bendigo': gwRegion = "VIC - Bendigo"; break;
+    case 'Goulburn Valley': gwRegion = "VIC - Goulburn Valley"; break;
+    case 'Nagambie Lakes': gwRegion = "VIC - Goulburn Valley (Nagambie Lake)"; break;
+    case 'Heathcote': gwRegion = "VIC - Heathcote"; break;
+    case 'Strathbogie Ranges': gwRegion = "VIC - Strathbogie Ranges"; break;
+    case 'Upper Goulburn': gwRegion = "VIC - Upper Goulburn"; break;
+    case 'Gippsland': gwRegion = "VIC - Gippsland"; break;
+    case 'North East Victoria': gwRegion = "VIC - North East Victoria"; break;
+    case 'Alpine Valleys': gwRegion = "VIC - Alpine Valleys"; break;
+    case 'Beechworth': gwRegion = "VIC - Beechworth"; break;
+    case 'Glenrowan': gwRegion = "VIC - Glenrowan"; break;
+    case 'King Valley': gwRegion = "VIC - King Valley"; break;
+    case 'Rutherglen': gwRegion = "VIC - Rutherglen"; break;
+    case 'North West Victoria': gwRegion = "VIC - North West Victoria"; break;
+    case 'Murray Darling-Vic': gwRegion = "VIC - Murray Darling"; break;
+    case 'Swan Hill-Vic': gwRegion = "VIC - Swan Hill"; break;
+    case 'Port Phillip': gwRegion = "VIC - Port Phillip"; break;
+    case 'Geelong': gwRegion = "VIC - Geelong"; break;
+    case 'Macedon Ranges': gwRegion = "VIC - Macedon Ranges"; break;
+    case 'Mornington Peninsula': gwRegion = "VIC - Mornington Peninsula"; break;
+    case 'Sunbury': gwRegion = "VIC - Sunbury"; break;
+    case 'Yarra Valley': gwRegion = "VIC - Yarra Valley"; break;
+    case 'Western Victoria': gwRegion = "VIC - Western Victoria"; break;
+    case 'Grampians': gwRegion = "VIC - Grampians"; break;
+    case 'Great Western': gwRegion = "VIC - Grampians (Great Western)"; break;
+    case 'Henty': gwRegion = "VIC - Henty"; break;
+    case 'Pyrenees': gwRegion = "VIC - Pyrenees"; break;
+    case 'Queensland': gwRegion = "QLD - Unspecified"; break;
+    case 'Granite Belt': gwRegion = "QLD - Granite Belt"; break;
+    case 'South Burnett': gwRegion = "QLD - South Burnett"; break;
+    case 'South Australia': gwRegion = "SA - Unspecified"; break;
+    case 'Adelaide': gwRegion = "VIC - Adelaide"; break;
+    case 'Barossa': gwRegion = "VIC - Barossa"; break;
+    case 'Barossa Valley': gwRegion = "SA - Barossa Valley"; break;
+    case 'Eden Valley': gwRegion = "SA - Eden Valley"; break;
+    case 'High Eden': gwRegion = "SA - Eden Valley (High Eden)"; break;
+    case 'Far North': gwRegion = "VIC - Far North"; break;
+    case 'Southern Flinders Ranges': gwRegion = "SA - Southern Flinders Ranges"; break;
+    case 'Fleurieu': gwRegion = "VIC - Fleurieu"; break;
+    case 'Currency Creek': gwRegion = "SA - Currency Creek"; break;
+    case 'Kangaroo Island': gwRegion = "SA - Kangaroo Island"; break;
+    case 'Langhorne Creek': gwRegion = "SA - Langhorne Creek"; break;
+    case 'McLaren Vale': gwRegion = "SA - McLaren Vale"; break;
+    case 'Southern Fleurieu': gwRegion = "SA - Southern Fleurieu"; break;
+    case 'Limestone Coast': gwRegion = "SA - Limestone Coast"; break;
+    case 'Coonawarra': gwRegion = "SA - Coonawarra"; break;
+    case 'Mount Benson': gwRegion = "SA - Mount Benson"; break;
+    case 'Padthaway': gwRegion = "SA - Padthaway"; break;
+    case 'Robe': gwRegion = "VIC - Robe"; break;
+    case 'Wrattonbully': gwRegion = "SA - Wrattonbully"; break;
+    case 'Mount Gambier': gwRegion = "SA - Mt Gambier"; break;
+    case 'Lower Murray': gwRegion = "SA - Lower Murray (Other)"; break;
+    case 'Riverland': gwRegion = "SA - Riverland"; break;
+    case 'Mount Lofty Ranges': gwRegion = "VIC - Mount Lofty Ranges"; break;
+    case 'Adelaide Hills': gwRegion = "SA - Adelaide Hills"; break;
+    case 'Lenswood': gwRegion = "SA - Adelaide Hills (Lenswood)"; break;
+    case 'Piccadilly Valley': gwRegion = "SA - Adelaide Hills (Piccadilly Valley)"; break;
+    case 'Adelaide Plains': gwRegion = "SA - Adelaide Plains"; break;
+    case 'Clare Valley': gwRegion = "SA - Clare Valley"; break;
+    case 'The Peninsulas': gwRegion = "SA - The Peninsulas"; break;
+    case 'Western Australia': gwRegion = "WA - Unspecified"; break;
+    case 'Central Western Australia': gwRegion = "WA - Central Western Australia"; break;
+    case 'Eastern Plains, Inland and North of Western Australia': gwRegion = "WA - Eastern Plains, Inland & North"; break;
+    case 'Greater Perth': gwRegion = "VIC - Greater Perth"; break;
+    case 'Peel': gwRegion = "WA - Peel"; break;
+    case 'Perth Hills': gwRegion = "WA - Perth Hills"; break;
+    case 'Swan District': gwRegion = "WA - Swan District"; break;
+    case 'Swan Valley': gwRegion = "WA - Swan District (Swan Valley)"; break;
+    case 'South West Australia': gwRegion = "WA - South West Australia"; break;
+    case 'Blackwood Valley': gwRegion = "WA - Blackwood Valley"; break;
+    case 'Geographe': gwRegion = "WA - Geographe"; break;
+    case 'Great Southern': gwRegion = "VIC - Great Southern"; break;
+    case 'Albany': gwRegion = "WA - Great Southern (Albany)"; break;
+    case 'Denmark': gwRegion = "WA - Great Southern (Denmark)"; break;
+    case 'Frankland River': gwRegion = "WA - Great Southern (Frankland River)"; break;
+    case 'Mount Barker': gwRegion = "WA - Great Southern (Mt Barker)"; break;
+    case 'Porongurup': gwRegion = "WA - Great Southern (Porongurup)"; break;
+    case 'Manjimup': gwRegion = "VIC - Manjimup"; break;
+    case 'Margaret River': gwRegion = "WA - Margaret River"; break;
+    case 'Pemberton': gwRegion = "WA - Pemberton"; break;
+    case 'West Australian South East Coastal': gwRegion = "WA - South East Coastal"; break;
+    case 'Tasmania': gwRegion = "TAS - Tasmania"; break;
+    case 'Northern Territory': gwRegion = "NT - Northern Territory"; break;
+    case 'Australian Capital Territory': gwRegion = "ACT - Australian Capital Territory"; break;
+    default: gwRegion = "OTH - " + region;
+  }
+            /*
+            switch (growerVyBlk.v_name_gistate) {
+              case 'Victoria':
+                arowData[29] = "VIC - ";
+                break;
+              case 'New South Wales':
+                arowData[29] = "NSW - ";
+                break;
+              case 'Queensland':
+                arowData[29] = "QLD - ";
+                break;
+              case 'South Australia':
+                arowData[29] = "SA - ";
+                break;
+              case 'Western Australia':
+                arowData[29] = "WA - ";
+                break;
+              case 'Tasmainia':
+                arowData[29] = "TAS - ";
+                break;
+              case 'Northern Territory':
+                arowData[29] = "NT - ";
+                break;
+              case 'Australian Capital Territory':
+                arowData[29] = "ACT - ";
+                break;
+              default:
+                arowData[29] = "OTH - ";
+            }
+            */
+  return gwRegion;
+}
+
+/*
+
+
+// Generate a log, then email it to the person who ran the script.
+var files = DriveApp.getFiles();
+while (files.hasNext()) {
+  Logger.log(files.next().getName());
+}
+var recipient = Session.getActiveUser().getEmail();
+var subject = 'A list of files in your Google Drive';
+var body = Logger.getLog();
+MailApp.sendEmail(recipient, subject, body);
+
+
+*/
+
 
 
 function serverUpload1(jsonData) {
@@ -531,6 +819,75 @@ function serverUpload2(jsonData) {
   }
   */
 }
+
+
+/*
+
+function onOpen() {
+  setCheckboxes();
+};
+
+function setCheckboxes() {
+  var checklist = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("checklist");
+  var checklist_data_range = checklist.getDataRange();
+  var checklist_num_rows = checklist_data_range.getNumRows();
+  Logger.log("checklist num rows: " + checklist_num_rows);
+
+  var coredata = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("core_data");
+  var coredata_data_range = coredata.getDataRange();
+
+  for(var i = 0 ; i < checklist_num_rows-1; i++) {
+    var split = checklist_data_range.getCell(i+2, 3).getValue().split(" || ");
+    var item_id = split[split.length - 1];
+    if(item_id != "") {
+      item_id = parseInt(item_id);
+      Logger.log("setting value at ("+(i+2)+",2) to " + coredata_data_range.getCell(item_id+1, 3).getValue());
+      checklist_data_range.getCell(i+2,2).setValue(coredata_data_range.getCell(item_id+1, 3).getValue());
+    }
+  }
+}
+
+function onEdit() {
+  Logger.log("TESTING TESTING ON EDIT");
+  var active_sheet = SpreadsheetApp.getActiveSheet();
+  if(active_sheet.getName() == "checklist") {
+    var active_range = SpreadsheetApp.getActiveSheet().getActiveRange();
+    Logger.log("active_range: " + active_range);
+    Logger.log("active range col: " + active_range.getColumn() + "active range row: " + active_range.getRow());
+    Logger.log("active_range.value: " + active_range.getCell(1, 1).getValue());
+    Logger.log("active_range. colidx: " + active_range.getColumnIndex());
+    if(active_range.getCell(1,1).getValue() == "?" || active_range.getCell(1,1).getValue() == "?") {
+      Logger.log("made it!");
+      var next_cell = active_sheet.getRange(active_range.getRow(), active_range.getColumn()+1, 1, 1).getCell(1,1);
+      var val = next_cell.getValue();
+      Logger.log("val: " + val);
+      var splits = val.split(" || ");
+      var item_id = splits[splits.length-1];
+      Logger.log("item_id: " + item_id);
+
+      var core_data = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("core_data");
+      var sheet_data_range = core_data.getDataRange();
+      var num_rows = sheet_data_range.getNumRows();
+      var sheet_values = sheet_data_range.getValues();
+      Logger.log("num_rows: " + num_rows);
+
+      for(var i = 0; i < num_rows; i++) {
+        Logger.log("sheet_values[" + (i) + "][" + (8) + "] = " + sheet_values[i][8]);
+        if(sheet_values[i][8] == item_id) {
+          Logger.log("found it! tyring to set it...");
+          sheet_data_range.getCell(i+1, 2+1).setValue(active_range.getCell(1,1).getValue());
+        }
+      }
+
+    }
+  }
+
+  setCheckboxes();
+};
+
+*/
+
+
 /*
 
 gc_instruction

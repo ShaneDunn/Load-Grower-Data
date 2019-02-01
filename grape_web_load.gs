@@ -66,7 +66,7 @@ function getBlockIDsFromSheet() {
 
   var idGroup =  idGroups.map(function(value,index) { return value[30]; });
   var mapGroup =  mapGroups.map(function(value,index) { return value[0]; });
-  Logger.log(mapGroup);
+  // Logger.log(mapGroup);
   
   for (var i = 0; i < blockIDs.length; i++)
   {

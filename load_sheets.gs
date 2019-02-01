@@ -1,15 +1,18 @@
 function serverUpload3(jsonData) {
   // try{
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var gdata  = [];
-    var vdata  = [];
-    var qdata  = [];
-    var cdata  = [];
-    var adata  = [];
+    var gdata  = []; // Grower Data
+    var vdata  = []; // Vineyard Data
+    var qdata  = []; // Quick Contacts Data
+    var cdata  = []; // Contractor Data
+    var adata  = []; // Grapeweb Load Data
+    var bdata  = []; // Block Data
     var sep    = "";
     var hvFax1 = "";
     var email1 = "";
     var qsep   = "";
+
+    var cntr_arr = "";
 
     for (var i = 0; i < jsonData.ds_Grower.tt_gr_mstr.length; i++) {
       var grower = jsonData.ds_Grower.tt_gr_mstr[i];
@@ -55,13 +58,12 @@ function serverUpload3(jsonData) {
       for ( var n=0; n < growData.length; n++ ) {
         growData[n] = "";
       }
-      var qrowData = new Array(4);
       var cont_arr = "";
-      for ( var n=0; n < growData.length; n++ ) {
+      var qrowData = new Array(4);
+      for ( var n=0; n < qrowData.length; n++ ) {
         qrowData[n] = "";
       }
-      var crowData = new Array(4);
-      var cntr_arr = "";
+      var crowData = new Array(6);
       for ( var n=0; n < crowData.length; n++ ) {
         crowData[n] = "";
       }
@@ -72,24 +74,35 @@ function serverUpload3(jsonData) {
         growData[11] = grower.frg__chr02.toUpperCase().trim() ;   // Cartage Contractor Code
       }
       if ( typeof growerAd   !== 'undefined' && growerAd   !== null ) {
-        if (growerAd.ad__chr02.indexOf(",") !== -1) {
-          hvFax1 = growerAd.ad__chr02.split(',').slice(0,1).join(' ').trim();
-          email1 = growerAd.ad__chr02.split(',').slice(1).join(' ').trim();
+        if (growerAd.usrw_charfld_05.indexOf(",") !== -1) {
+          hvFax1 = growerAd.usrw_charfld_05.split(',').slice(0,1).join(' ').trim();
+          email1 = growerAd.usrw_charfld_05.split(',').slice(1).join(' ').trim();
         } else {
-          hvFax1 = growerAd.ad__chr02.trim() ;
-          email1 = "" ; // growerAd.ad__chr02.trim() ;
+          hvFax1 = growerAd.usrw_charfld_05.trim() ;
+          email1 = "" ; // growerAd.usrw_charfld_05.trim() ;
         }
         growData[1]  = growerAd.ad_name + crlf + loadAddress(growerAd.ad_line1, growerAd.ad_line2, growerAd.ad_line3, growerAd.ad_city, growerAd.ad_state, growerAd.ad_zip) ; // Res/Add
-        growData[3]  = loadContact(growerAd.ad_attn, growerAd.ad_fax2, growerAd.ad_phone, growerAd.ad_fax, growerAd.ad__chr01) ; // Contact 1
-        growData[4]  = loadContact(growerAd.ad_attn2, growerAd.ad_phone2, "", "", "") ; // Contact 2
+        growData[3]  = loadContact(growerAd.ad_attn, growerAd.usrw_charfld_01, growerAd.ad_phone, growerAd.ad_fax, growerAd.usrw_charfld_02) ; // Contact 1
+        growData[4]  = loadContact(growerAd.ad_attn2, growerAd.usrw_charfld_03, growerAd.ad_phone2, growerAd.ad_fax2, growerAd.usrw_charfld_04) ; // Contact 2
         growData[5]  = "" ; // Contact 3
-        growData[6]  = loadHAemail(hvFax1, email1)  ; // Harvest Advice Fax/Email
+        growData[6]  = loadHAemail(growerAd.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+        growData[20] = growerAd.usrw_charfld_06  ; // Salutation
         qrowData[0]  = growerAd.ad_name;
-        if (formatPhoneNumber(growerAd.ad_fax2) !== null) {
+
+        if (formatPhoneNumber(growerAd.ad_phone) !== null) {
           qrowData[2]  = growerAd.ad_attn;
-          qrowData[1]  = formatPhoneNumber(growerAd.ad_fax2);
-          cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn + formatPhoneNumber(growerAd.ad_fax2);
+          qrowData[1]  = formatPhoneNumber(growerAd.ad_phone);
+          cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn + formatPhoneNumber(growerAd.ad_phone);
           qsep = crlf;
+        }
+        if (formatPhoneNumber(growerAd.usrw_charfld_01) !== null) {
+          if (cont_arr.indexOf(growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.usrw_charfld_01)) == -1) {
+            cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.usrw_charfld_01);
+            qrowData[2]  = growerAd.ad_attn;
+            qrowData[1]  = formatPhoneNumber(growerAd.usrw_charfld_01);
+            cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn + formatPhoneNumber(growerAd.usrw_charfld_01);
+            qsep = crlf;
+          }
         }
         if (growerAd.ad_attn2) {
           if (formatPhoneNumber(growerAd.ad_phone2) !== null) {
@@ -100,21 +113,65 @@ function serverUpload3(jsonData) {
               qsep = crlf;
             }
           }
+          if (formatPhoneNumber(growerAd.usrw_charfld_03) !== null) {
+            if (cont_arr.indexOf(growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.usrw_charfld_03)) == -1) {
+              cont_arr = cont_arr + "|" + growerAd.ad_name + growerAd.ad_attn2 + formatPhoneNumber(growerAd.usrw_charfld_03);
+              qrowData[2]  = qrowData[2] + qsep + growerAd.ad_attn2;
+              qrowData[1]  = qrowData[1] + qsep + formatPhoneNumber(growerAd.usrw_charfld_03);
+              qsep = crlf;
+            }
+          }
         }
       }
       if ( typeof growerCc   !== 'undefined' && growerCc   !== null ) {
         growData[12] = growerCc.ad_name       ;   // Contractor
-        growData[13] = loadContact(growerCc.ad_attn, growerCc.ad_fax2, growerCc.ad_phone, growerCc.ad_fax, growerCc.ad__chr01) ; // Contact 1
-        growData[14] = loadContact(growerCc.ad_attn2, growerCc.ad_phone2, "", "", growerCc.ad__chr02) ; // Contact 2
+        growData[13] = loadContact(growerCc.ad_attn, growerCc.usrw_charfld_01, growerCc.ad_phone, growerCc.ad_fax, growerCc.usrw_charfld_02) ; // Contact 1
+        growData[14] = loadContact(growerCc.ad_attn2, growerCc.usrw_charfld_03, growerCc.ad_phone2, growerCc.ad_fax2, growerCc.usrw_charfld_04) ; // Contact 2
+        growData[19] = loadHAemail(growerCc.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+        
+        // load contractor details
+        if (cntr_arr.indexOf(grower.frg__chr02.toUpperCase().trim()) == -1) {
+          cntr_arr = cntr_arr + "|" + grower.frg__chr02.toUpperCase().trim();
+          // Logger.log(cntr_arr);
+          crowData[0] = grower.frg__chr02.toUpperCase().trim();
+          crowData[1] = growerCc.ad_name       ;   // Contractor
+          crowData[2] = loadContact(growerCc.ad_attn, growerCc.usrw_charfld_01, growerCc.ad_phone, growerCc.ad_fax, growerCc.usrw_charfld_02) ; // Contact 1
+          crowData[3] = loadContact(growerCc.ad_attn2, growerCc.usrw_charfld_03, growerCc.ad_phone2, growerCc.ad_fax2, growerCc.usrw_charfld_04) ; // Contact 2
+          crowData[4] = loadHAemail(growerCc.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+          if ( typeof growerVd !== 'undefined' && growerVd !== null ) {
+            crowData[5] = growerVd.vd_type.toUpperCase() ;  //  sort
+          } else { crowData[5] = "" }
+          cdata.push(crowData);
+        }
+        
       }
       if ( typeof growerHc   !== 'undefined' && growerHc   !== null ) {
         growData[8]  = growerHc.ad_name       ;   // Contractor
-        growData[9]  = loadContact(growerHc.ad_attn, growerHc.ad_fax2, growerHc.ad_phone, growerHc.ad_fax, growerHc.ad__chr01) ; // Contact 1
-        growData[10] = loadContact(growerHc.ad_attn2, growerHc.ad_phone2, "", "", growerHc.ad__chr02) ; // Contact 2
+        growData[9]  = loadContact(growerHc.ad_attn, growerHc.usrw_charfld_01, growerHc.ad_phone, growerHc.ad_fax, growerHc.usrw_charfld_02) ; // Contact 1
+        growData[10] = loadContact(growerHc.ad_attn2, growerHc.usrw_charfld_03, growerHc.ad_phone2, growerHc.ad_fax2, growerHc.usrw_charfld_04) ; // Contact 2
+        growData[18] = loadHAemail(growerHc.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+        
+        // load contractor details
+        if (cntr_arr.indexOf(grower.frg__chr01.toUpperCase().trim()) == -1) {
+          cntr_arr = cntr_arr + "|" + grower.frg__chr01.toUpperCase().trim();
+          // Logger.log(cntr_arr);
+          crowData[0] = grower.frg__chr01.toUpperCase().trim();
+          crowData[1] = growerHc.ad_name       ;   // Contractor
+          crowData[2] = loadContact(growerHc.ad_attn, growerHc.usrw_charfld_01, growerHc.ad_phone, growerHc.ad_fax, growerHc.usrw_charfld_02) ; // Contact 1
+          crowData[3] = loadContact(growerHc.ad_attn2, growerHc.usrw_charfld_03, growerHc.ad_phone2, growerHc.ad_fax2, growerHc.usrw_charfld_04) ; // Contact 2
+          crowData[4] = loadHAemail(growerHc.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+          if ( typeof growerVd !== 'undefined' && growerVd !== null ) {
+            crowData[5] = growerVd.vd_type.toUpperCase() ;  //  sort
+          } else { crowData[5] = "" }
+          cdata.push(crowData);
+        }
+        
       }
       if ( typeof growerVd   !== 'undefined' && growerVd   !== null ) {
-        growData[15]  = growerVd.vd_type.toUpperCase() ;  //  Type
-        qrowData[3]   = growerVd.vd_type.toUpperCase() + ":" + growerVd.vd_sort.toUpperCase() ;  //  sort
+        growData[15] = growerVd.vd_type.toUpperCase() ;  //  Type
+        qrowData[3]  = growerVd.vd_type.toUpperCase() + ":" + growerVd.vd_sort.toUpperCase() ;  //  sort
+        growData[16] = loadContact(growerVd.vd_ap_cntct, "", "", "", growerVd.vd__chr02) ; // AP / Finance Contact
+        growData[17] = loadContact(growerVd.vd_pur_cntct, "", "", "", growerVd.vd__chr01) ; // Purchasing Contact 2
       }
       if ( typeof growerVdAd !== 'undefined' && growerVdAd !== null ) {
         growData[2]  = growerVdAd.ad_name + crlf + loadAddress(growerVdAd.ad_line1, growerVdAd.ad_line2, growerVdAd.ad_line3, growerVdAd.ad_city, growerVdAd.ad_state, growerVdAd.ad_zip) ;   // P O Add
@@ -123,7 +180,7 @@ function serverUpload3(jsonData) {
         growData[5] = growData[5].trim() + sep +
                       loadContact(growerVdAd.ad_attn, growerVdAd.ad_fax2, growerVdAd.ad_phone, growerVdAd.ad_fax, growerVdAd.ad__chr01) ; // Contact 3
         if  (growerVdAd.ad_attn) {
-          if (formatPhoneNumber(growerAd.ad_phone) !== null) {
+          if (formatPhoneNumber(growerVdAd.ad_phone) !== null) {
             if (cont_arr.indexOf(growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone)) == -1) {
               cont_arr = cont_arr + "|" + growerAd.ad_name + growerVdAd.ad_attn + formatPhoneNumber(growerVdAd.ad_phone);
               qrowData[2]  = qrowData[2] + qsep + growerVdAd.ad_attn;
@@ -166,7 +223,7 @@ function serverUpload3(jsonData) {
         for (var k = 0; k < growerVy.tt_blk_mstr.length; k++) {
           var growerVyBlk = growerVy.tt_blk_mstr[k];
           // Logger.log(growerVyBlk.afvi_vineyard);
-          var arowData = new Array(47);
+          var arowData = new Array(47); // Grapeweb Data
           for ( var n=0; n < arowData.length; n++ ) {
             arowData[n] = "";
           }
@@ -181,24 +238,14 @@ function serverUpload3(jsonData) {
           if ( typeof growerAd   !== 'undefined' && growerAd   !== null ) {
             var firstName = growerAd.ad_attn.split(' ').slice(0, 1).join(' ');
             var lastName = growerAd.ad_attn.split(' ').slice(1).join(' ');
-            if (growerAd.ad__chr02.indexOf(",") !== -1) {
-              var email1 = growerAd.ad__chr02.split(',').slice(1).join(' ').trim();
-            } else {
-              email1 = growerAd.ad__chr02.trim();
-            }
-            if ( growerAd.ad_fax2 !== "" ) {
-              var mobile1 = growerAd.ad_fax2;
-            } else {
-              mobile1 = growerAd.ad_phone2
-            }
             arowData[5]  = firstName.trim()       ; // contactfirstname
             arowData[6]  = lastName.trim()        ; // contactlastname
             arowData[7]  = growerAd.ad_gst_id     ; // abn
-            arowData[8]  = growerAd.ad__chr01     ; // email
+            arowData[8]  = formatGwEmail(growerAd.usrw_charfld_02, arowData[5], arowData[6])     ; // email
             arowData[9]  = growerAd.ad_name       ; // tradingname
-            arowData[10] = growerAd.ad_phone      ; // phone
-            arowData[11] = growerAd.ad_fax        ; // fax
-            arowData[12] = growerAd.ad_fax2       ; // mobile
+            arowData[10] = formatPhoneNumber(growerAd.ad_phone)      ; // phone
+            arowData[11] = formatPhoneNumber(growerAd.ad_fax)        ; // fax
+            arowData[12] = formatPhoneNumber(growerAd.usrw_charfld_01)       ; // mobile
             arowData[13] = growerAd.ad_line1      ; // businessaddressline1
             arowData[14] = loadAddress2(growerAd.ad_line2, growerAd.ad_line3) ; // businessaddressline2
             arowData[15] = growerAd.ad_city       ; // businessaddresstown
@@ -219,44 +266,16 @@ function serverUpload3(jsonData) {
           // grape2webblockid
           if ( typeof growerVyBlk   !== 'undefined' && growerVyBlk   !== null ) {
 
-            arowData[28] = growerVyBlk.v_xvar_desc       ; // variety
-            switch (growerVyBlk.v_name_gistate) {
-              case 'Victoria':
-                arowData[29] = "VIC - ";
-                break;
-              case 'New South Wales':
-                arowData[29] = "NSW - ";
-                break;
-              case 'Queensland':
-                arowData[29] = "QLD - ";
-                break;
-              case 'South Australia':
-                arowData[29] = "SA - ";
-                break;
-              case 'Western Australia':
-                arowData[29] = "WA - ";
-                break;
-              case 'Tasmainia':
-                arowData[29] = "TAS - ";
-                break;
-              case 'Northern Territory':
-                arowData[29] = "NT - ";
-                break;
-              case 'Australian Capital Territory':
-                arowData[29] = "ACT - ";
-                break;
-              default:
-                arowData[29] = "OTH - ";
-            }
-            arowData[29] = arowData[29] + growerVyBlk.v_name_gi_region  ; // region
-            arowData[30] = growerVyBlk.afvi_id           ; // wineryblockid
-            arowData[32] = growerVyBlk.afvi_code         ; // blockname
-            arowData[33] = growerVyBlk.afvi_plants       ; // numofvines                /ds_Grower/tt_gr_mstr/tt_vy_mstr/tt_blk_mstr/afvi_plants or /ds_Grower/tt_gr_mstr/tt_vy_mstr/tt_blk_mstr/afvi_rows
-            arowData[34] = growerVyBlk.afvi_rootstock    ; // rootstock
-            arowData[35] = growerVyBlk.afvi_pyear        ; // yearplanted
-            arowData[36] = growerVyBlk.afvi_row_spacing  ; // rowspace
-            arowData[37] = growerVyBlk.afvi_vine_spacing ; // vinespace
-            arowData[38] = growerVyBlk.afvi_hectares     ; // hectares
+            arowData[28] = getVarietyMap(growerVyBlk.v_xvar_desc); // variety
+            arowData[29] = getRegionMap(growerVyBlk.v_name_gi_region); // region
+            arowData[30] = growerVyBlk.afvi_id             ; // wineryblockid
+            arowData[32] = growerVyBlk.afvi_code           ; // blockname
+            arowData[33] = growerVyBlk.afvi_plants         ; // numofvines                /ds_Grower/tt_gr_mstr/tt_vy_mstr/tt_blk_mstr/afvi_plants or /ds_Grower/tt_gr_mstr/tt_vy_mstr/tt_blk_mstr/afvi_rows
+            arowData[34] = growerVyBlk.afvi_rootstock      ; // rootstock
+            arowData[35] = growerVyBlk.afvi_pyear          ; // yearplanted
+            arowData[36] = growerVyBlk.afvi_row_spacing    ; // rowspace
+            arowData[37] = growerVyBlk.afvi_vine_spacing   ; // vinespace
+            arowData[38] = growerVyBlk.afvi_hectares       ; // hectares
             arowData[39] = growerVyBlk.v_name_gisub_region ; // subregion
             // contractstatus
             arowData[41] = growerVyBlk.afvi_xregion + ":" + growerVyBlk.afvi_xarea ; // wineryregion
@@ -279,22 +298,136 @@ function serverUpload3(jsonData) {
             }
           }
           for ( var n=0; n < arowData.length; n++ ) {
-            if (arowData[n] !== "") {
-              // Logger.log(arowData[n]);
-              if ( !isNaN(arowData[n]) ) {
-                arowData[n] = "'" + arowData[n].toString();
-              } else {
-                // arowData[n] = arowData[n].trim();
+            if ( typeof arowData[n]   !== 'undefined' && arowData[n]   !== null ) {
+              if (arowData[n] !== "") {
+                // Logger.log(arowData[n]);
+                if ( !isNaN(arowData[n]) ) {
+                  arowData[n] = "'" + arowData[n].toString();
+                } else {
+                  // arowData[n] = arowData[n].trim();
+                }
               }
             }
           }
           adata.push(arowData);
+          
+          if ( typeof growerVyBlk   !== 'undefined' && growerVyBlk   !== null ) {
+            var browData = new Array(93); // Grapeweb Data
+            for ( var n=0; n < browData.length; n++ ) {
+              browData[n] = "";
+            }
+            // browData[0]  = growerVyBlk.afvi_grower             ; // Grower Code
+            if ( typeof grower     !== 'undefined' && grower     !== null ) {
+              browData[0]  = grower.frg_grower.toUpperCase() ; // Grower Code
+            }
+            browData[1]  = growerVyBlk.afvi_vineyard_id        ; // Vineyard Id
+            browData[2]  = growerVyBlk.afvi_vineyard           ; // Vineyard Code
+            browData[3]  = growerVyBlk.afvi_id                 ; // Block ID
+            browData[4]  = growerVyBlk.afvi_code               ; // Block Code
+            browData[5]  = growerVyBlk.afvi_name               ; // Block Name
+            browData[6]  = growerVyBlk.afvi_ext1_code          ; // External Block code
+            browData[7]  = growerVyBlk.afvi_variety            ; // Variety
+            browData[8]  = growerVyBlk.v_xvar_desc             ; // Variety Description
+            browData[9]  = growerVyBlk.afvi_variety_mixed      ; // Inter-Mixed
+            browData[10] = growerVyBlk.afvi_variety_family     ; // VarieterialFamily
+            browData[11] = growerVyBlk.afvi_xregion            ; // Grower Area
+            browData[12] = growerVyBlk.v_name_xregion          ; // Grower Area Description
+            browData[13] = growerVyBlk.afvi_xarea              ; // Grower Sub Area
+            browData[14] = growerVyBlk.v_name_xarea            ; // Grower Sub Area Description
+            browData[15] = growerVyBlk.afvi_contract           ; // Contract
+            browData[16] = growerVyBlk.afvi_pct_contracted     ; // % Contracted
+            browData[17] = growerVyBlk.afvi_pmethod            ; // Default Pick Method
+            browData[18] = growerVyBlk.v_pmethod               ; // Default Pick Method Description
+            browData[19] = growerVyBlk.afvi_hectaresplanted    ; // Hectares Planted
+            browData[20] = growerVyBlk.afvi_hectares           ; // Hectares
+            browData[21] = growerVyBlk.afvi_def_grade          ; // Potential Grade
+            browData[22] = growerVyBlk.v_def_grade             ; // Potential Grade Description
+            browData[23] = growerVyBlk.afvi_enduse             ; // End Use
+            browData[24] = growerVyBlk.v_def_enduse            ; // End Use Description
+            browData[25] = growerVyBlk.afvi_rows               ; // Rows
+            browData[26] = growerVyBlk.afvi_row_spacing        ; // Row Spacing
+            browData[27] = growerVyBlk.afvi_vine_spacing       ; // Vine Spacing
+            browData[28] = growerVyBlk.afvi_plants             ; // Plants
+            browData[29] = growerVyBlk.afvi_vines_hect         ; // Vines Per Hectare
+            browData[30] = growerVyBlk.afvi_cordon_lm          ; // Cordon Linear Metres
+            browData[31] = growerVyBlk.afvi_cordon_hect        ; // Cordon per Hectare
+            browData[32] = growerVyBlk.afvi_cordon_no          ; // No. of Cordons
+            browData[33] = growerVyBlk.afvi_trellis_lm         ; // Trellis Linear Metres
+            browData[34] = growerVyBlk.afvi_trellis_movable    ; // Trellis Movable Wires
+            browData[35] = growerVyBlk.afvi_tmethod            ; // Trellis Method
+            browData[36] = growerVyBlk.v_tmethod               ; // Trellis Method Description
+            browData[37] = growerVyBlk.afvi_vine_training      ; // Training Type
+            browData[38] = growerVyBlk.afvi_canopy_style       ; // Canopy Style
+            browData[39] = growerVyBlk.v_canopy_style          ; // Canopy Style Description
+            browData[40] = growerVyBlk.afvi_pyear              ; // Planted
+            browData[41] = growerVyBlk.afvi_planted_mixed      ; // Dates Planted (mixed)
+            browData[42] = growerVyBlk.afvi_clones             ; // Clones
+            browData[43] = growerVyBlk.v_clones                ; // Clones Description
+            browData[44] = growerVyBlk.afvi_rootstock          ; // Rootstock
+            browData[45] = growerVyBlk.v_rootstock             ; // Rootstock Description
+            browData[46] = growerVyBlk.afvi_rootstock_gv       ; // Rootstock Graft Variety
+            browData[47] = growerVyBlk.v_rootstock_gv          ; // Rootstock Graft Variety Description
+            browData[48] = growerVyBlk.afvi_rootstock_notes    ; // Rootstock Graft Notes
+            browData[49] = growerVyBlk.afvi_provider           ; // Provider of vines
+            browData[50] = growerVyBlk.afvi_wmethod            ; // Watering Method
+            browData[51] = growerVyBlk.v_wmethod               ; // Watering Method Description
+            browData[52] = growerVyBlk.afvi_swmethod           ; // Secondary Irrigation
+            browData[53] = growerVyBlk.v_swmethod              ; // Secondary Irrigation Description
+            browData[54] = growerVyBlk.afvi_water_security     ; // Water Security
+            browData[55] = growerVyBlk.v_water_security        ; // Water Security Description
+            browData[56] = growerVyBlk.afvi_irrigation_valves  ; // Irrigation Valves
+            browData[57] = growerVyBlk.afvi_vine_valve         ; // Vines per Valve
+            browData[58] = growerVyBlk.afvi_drainage_syst      ; // Drainage System
+            browData[59] = growerVyBlk.v_drainage_syst         ; // Drainage System Description
+            browData[60] = growerVyBlk.afvi_moisture_mon       ; // Moisture Monitoring Method
+            browData[61] = growerVyBlk.v_moisture_mon          ; // Moisture Monitoring Method Description
+            browData[62] = growerVyBlk.afvi_inter_row_mgt      ; // Inter-row Management
+            browData[63] = growerVyBlk.v_inter_row_mgt         ; // Inter-row Management Description
+            browData[64] = growerVyBlk.afvi_direction          ; // Vines Row Direction
+            browData[65] = growerVyBlk.v_direction             ; // Vines Row Direction Description
+            browData[66] = growerVyBlk.afvi_ter_aspect         ; // Terrain Aspect
+            browData[67] = growerVyBlk.v_ter_aspect            ; // Terrain Aspect Description
+            browData[68] = growerVyBlk.afvi_ter_elevation      ; // Terrain Elevation
+            browData[69] = growerVyBlk.afvi_ter_slope          ; // Terrain Slope
+            browData[70] = growerVyBlk.afvi_soil_type          ; // Soil Type
+            browData[71] = growerVyBlk.v_soil_type             ; // Soil Type Description
+            browData[72] = growerVyBlk.afvi_soil_depth         ; // Soil Depth
+            browData[73] = growerVyBlk.afvi_soil_texture       ; // Soil Texture
+            browData[74] = growerVyBlk.v_soil_texture          ; // Soil Texture Description
+            browData[75] = growerVyBlk.afvi_soil_structure     ; // Soil Structure
+            browData[76] = growerVyBlk.v_soil_structure        ; // Soil Structure Description
+            browData[77] = growerVyBlk.afvi_soil_terrior       ; // Soil Terroir
+            browData[78] = growerVyBlk.afvi_terrior            ; // Terrior Notes
+            browData[79] = growerVyBlk.afvi_appellation        ; // Appellation
+            browData[80] = growerVyBlk.v_name_appellation      ; // Appellation Description
+            browData[81] = growerVyBlk.afvi_gi_region          ; // GI Region
+            browData[82] = growerVyBlk.v_name_gi_region        ; // GI Region Description
+            browData[83] = growerVyBlk.afvi_gisub_region       ; // GI Sub Region
+            browData[84] = growerVyBlk.v_name_gisub_region     ; // GI Sub Region Description
+            browData[85] = growerVyBlk.afvi_gistate            ; // GI State
+            browData[86] = growerVyBlk.v_name_gistate          ; // GI State Description
+            browData[87] = growerVyBlk.afvi_gizone             ; // GI Zone
+            browData[88] = growerVyBlk.v_name_gizone           ; // GI Zone Description
+            browData[89] = growerVyBlk.afvi_changes.trim()     ; // Changes
+            browData[90] = growerVyBlk.afvi_cmtindx            ; // Comment Index
+            browData[91] = growerVyBlk.afvi_comments           ; // Comments
+            browData[92] = growerVyBlk.afvi_gps.trim()         ; // GPS Position
+            browData[93] = growerVyBlk.afvi_shape.trim().replace(/[|&$%@"<>()\n]/g, "") ; // GIS Shape Data
+
+            bdata.push(browData);
+          }   
+          
         }
 
         // Vineyard level data rows
         var rowData = new Array(29);
         for ( var n=0; n < rowData.length; n++ ) {
           rowData[n] = "";
+        }
+
+        var crowData = new Array(5);
+        for ( var n=0; n < crowData.length; n++ ) {
+          crowData[n] = "";
         }
 
         if ( typeof grower     !== 'undefined' && grower     !== null ) {
@@ -366,6 +499,23 @@ function serverUpload3(jsonData) {
                                loadContact(growerVyHc.ad_attn2, growerVyHc.ad_phone2, "", "", growerVyHc.ad__chr02) ; // Contact 2
               }
             }
+        
+            // load contractor details
+            if ( typeof growerVyHc   !== 'undefined' && growerVyHc   !== null ) {
+              if (cntr_arr.indexOf(growerVy.afvc__chr01.toUpperCase().trim()) == -1) {
+                cntr_arr = cntr_arr + "|" + growerVy.afvc__chr01.toUpperCase().trim();
+                // Logger.log(cntr_arr);
+                crowData[0] = growerVy.afvc__chr01.toUpperCase().trim();
+                crowData[1] = growerVyHc.ad_name       ;   // Contractor
+                crowData[2] = loadContact(growerVyHc.ad_attn, growerVyHc.usrw_charfld_01, growerVyHc.ad_phone, growerVyHc.ad_fax, growerVyHc.usrw_charfld_02) ; // Contact 1
+                crowData[3] = loadContact(growerVyHc.ad_attn2, growerVyHc.usrw_charfld_03, growerVyHc.ad_phone2, growerVyHc.ad_fax2, growerVyHc.usrw_charfld_04) ; // Contact 2
+                crowData[4] = loadHAemail(growerVyHc.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+                if ( typeof growerVd !== 'undefined' && growerVd !== null ) {
+                  crowData[5] = growerVd.vd_type.toUpperCase() ;  //  sort
+                } else { crowData[5] = "" }
+                cdata.push(crowData);
+              }
+            }
           }
           if ( growerVy.afvc_carrier) {
             if (growerVy.afvc_carrier.toUpperCase().trim() !== rowData[13].trim() ) {
@@ -387,7 +537,6 @@ function serverUpload3(jsonData) {
                             growerVy.afvc_carrier.toUpperCase().trim()  ;   // Cartage Contractor Code
               if ( typeof growerVyCc   !== 'undefined' && growerVyCc   !== null ) {
                 sep = "";
-                sep = "";
                 if ( growData[12] ) { sep = crlf; }
                 growData[12] = growData[12].trim() + sep +
                                growerVyCc.ad_name       ;   // Contractor
@@ -395,6 +544,23 @@ function serverUpload3(jsonData) {
                                loadContact(growerVyCc.ad_attn, growerVyCc.ad_fax2, growerVyCc.ad_phone, growerVyCc.ad_fax, growerVyCc.ad__chr01) ; // Contact 1
                 growData[14] = growData[14].trim() + sep +
                                loadContact(growerVyCc.ad_attn2, growerVyCc.ad_phone2, "", "", growerVyCc.ad__chr02) ; // Contact 2
+              }
+            }
+        
+            // load contractor details
+            if ( typeof growerVyCc   !== 'undefined' && growerVyCc   !== null ) {
+              if (cntr_arr.indexOf(growerVy.afvc_carrier.toUpperCase().trim()) == -1) {
+                cntr_arr = cntr_arr + "|" + growerVy.afvc_carrier.toUpperCase().trim();
+                // Logger.log(cntr_arr);
+                crowData[0] = growerVy.afvc_carrier.toUpperCase().trim();
+                crowData[1] = growerVyCc.ad_name       ;   // Contractor
+                crowData[2] = loadContact(growerVyCc.ad_attn, growerVyCc.usrw_charfld_01, growerVyCc.ad_phone, growerVyCc.ad_fax, growerVyCc.usrw_charfld_02) ; // Contact 1
+                crowData[3] = loadContact(growerVyCc.ad_attn2, growerVyCc.usrw_charfld_03, growerVyCc.ad_phone2, growerVyCc.ad_fax2, growerVyCc.usrw_charfld_04) ; // Contact 2
+                crowData[4] = loadHAemail(growerVyCc.usrw_charfld_05)  ; // Harvest Advice Fax/Email
+                if ( typeof growerVd !== 'undefined' && growerVd !== null ) {
+                  crowData[5] = growerVd.vd_type.toUpperCase() ;  //  sort
+                } else { crowData[5] = "" }
+                cdata.push(crowData);
               }
             }
           }
@@ -520,11 +686,11 @@ function serverUpload3(jsonData) {
     range.clearContent();
     sheet.getRange(2,1,qdata.length,qdata[0].length).setValues(qdata);
 
-    var sheetname = "Grapeweb";
-    var sheet = ss.getSheetByName(sheetname);
-    var lastRow = sheet.getLastRow();
-    var lastColumn = sheet.getLastColumn();
-    var range = sheet.getRange(2, 1, lastRow, lastColumn);
+    sheetname = "Grapeweb";
+    sheet = ss.getSheetByName(sheetname);
+    lastRow = sheet.getLastRow();
+    lastColumn = sheet.getLastColumn();
+    range = sheet.getRange(2, 1, lastRow, lastColumn);
     range.clearContent();
     adata.sort(function(a, b) {
       var c = a[46].toLowerCase(), d = b[46].toLowerCase();
@@ -544,37 +710,35 @@ function serverUpload3(jsonData) {
     });
     sheet.getRange(2,1,adata.length,adata[0].length).setValues(adata);
     
+    sheetname = "Blocks";
+    sheet = ss.getSheetByName(sheetname);
+    lastRow = sheet.getLastRow();
+    lastColumn = sheet.getLastColumn();
+    range = sheet.getRange(2, 1, lastRow, lastColumn);
+    range.clearContent();
+    bdata.sort(function(a, b) {
+      var c = a[0].toLowerCase(), d = b[0].toLowerCase();
+      if(c === d) {
+        var x = a[2].toLowerCase(), y = b[2].toLowerCase();
+        if (x === y) {
+          var u = a[4].toLowerCase(), v = b[4].toLowerCase();
+          return u < v ? -1 : u > v ? 1 : 0;
+        }
+        return x < y ? -1 : x > y ? 1 : 0;
+      }
+      return c < d ? -1 : c > d ? 1 : 0;
+    });
+    sheet.getRange(2,1,bdata.length,bdata[0].length).setValues(bdata);
+    
     // load contactor contacts
     
-    for (var r=0; r<gdata.length; r++) {
-      if ( gdata[r][7] != '' ) {
-        if (cntr_arr.indexOf(gdata[r][7] + gdata[r][8] + gdata[r][9] + gdata[r][10]) == -1) {
-          cntr_arr = cntr_arr + "|" + gdata[r][7] + gdata[r][8] + gdata[r][9] + gdata[r][10];
-          crowData[0] = gdata[r][7];
-          crowData[1] = gdata[r][8];
-          crowData[2] = gdata[r][9];
-          crowData[3] = gdata[r][10];
-          cdata.push(crowData);
-        }
-      }
-       if ( gdata[r][11] != '' ) {
-        if (cntr_arr.indexOf(gdata[r][11] + gdata[r][12] + gdata[r][13] + gdata[r][14]) == -1) {
-          cntr_arr = cntr_arr + "|" + gdata[r][11] + gdata[r][12] + gdata[r][13] + gdata[r][14];
-          crowData[0] = gdata[r][11];
-          crowData[1] = gdata[r][12];
-          crowData[2] = gdata[r][13];
-          crowData[3] = gdata[r][14];
-          cdata.push(crowData);
-        }
-      }
-   }
     sheetname = "Contractors";
     sheet = ss.getSheetByName(sheetname);
     lastRow = sheet.getLastRow();
     lastColumn = sheet.getLastColumn();
     range = sheet.getRange(2, 1, lastRow, lastColumn);
     cdata.sort(function(a, b) {
-      var c = a[1].toLowerCase(), d = b[1].toLowerCase();
+      var c = a[5].toLowerCase(), d = b[5].toLowerCase();
       if(c === d) {
         var x = a[0].toLowerCase(), y = b[0].toLowerCase();
         return x < y ? -1 : x > y ? 1 : 0;
